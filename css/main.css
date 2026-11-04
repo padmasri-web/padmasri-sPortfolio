@@ -1,0 +1,1022 @@
+/* ==========================================================================
+   MAIN STYLES: FULL-SCREEN RESPONSIVE 8-BIT GAMIFIED ROADMAP
+   Padmasri Chikle — AI/ML & Full-Stack Developer
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Pixelify+Sans:wght@500;700&family=Press+Start+2P&display=swap');
+
+:root {
+  --bg-dark: #10131a;
+  --bg-card: #1c212b;
+  --border-dark: #29303d;
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --accent-gold: #f1c40f;
+  --accent-green: #2ecc71;
+  --accent-blue: #38bdf8;
+  --accent-red: #e74c3c;
+  --accent-purple: #9b59b6;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Pixelify Sans', 'Fira Code', monospace;
+  overflow-x: hidden;
+  -webkit-font-smoothing: none;
+}
+
+/* CRT Scanline Filter Overlay (Subtle) */
+#crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(
+    rgba(18, 20, 26, 0) 50%, 
+    rgba(0, 0, 0, 0.2) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 999;
+  opacity: 0.45;
+}
+
+/* ==========================================================================
+   TOP RPG HUD BAR (Sticky at Top)
+   ========================================================================== */
+.top-hud-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: clamp(52px, 7vh, 62px);
+  background: rgba(22, 26, 35, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 3px solid #2e3544;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(8px, 2vw, 20px);
+}
+
+/* Player Profile Chip (Featuring Real Photo) */
+.player-hud-chip {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 1.2vw, 12px);
+  cursor: pointer;
+  background: #1c212b;
+  padding: 4px clamp(6px, 1.2vw, 12px);
+  border-radius: 10px;
+  border: 2px solid #3d4659;
+  transition: border-color 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+.player-hud-chip:hover {
+  border-color: var(--accent-gold);
+  transform: translateY(-1px);
+}
+
+.player-avatar-mini {
+  position: relative;
+  width: clamp(30px, 4vw, 38px);
+  height: clamp(30px, 4vw, 38px);
+  border-radius: 50%;
+  border: 2px solid var(--accent-gold);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  background: #252b38;
+  flex-shrink: 0;
+}
+
+.player-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+.online-beacon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  background: #2ecc71;
+  border: 2px solid #1c212b;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #2ecc71;
+}
+
+.player-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.player-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(8px, 1.1vw, 10px);
+  color: #ffffff;
+}
+
+.player-lvl-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(6.5px, 0.9vw, 8px);
+  background: var(--accent-gold);
+  color: #12141a;
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+
+.player-xp-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.xp-bar-bg {
+  width: 80px;
+  height: 5px;
+  background: #141720;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid #363e52;
+}
+
+.xp-bar-fill {
+  height: 100%;
+  width: 45%;
+  background: linear-gradient(90deg, #f1c40f, #e67e22);
+  transition: width 0.4s ease-out;
+}
+
+.xp-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   DYNAMIC NEXT STOP BANNER (CENTER OF HUD - Desktop & Tablets)
+   ========================================================================== */
+.hud-next-stop-tracker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #181d26;
+  border: 2px solid #353e50;
+  padding: 6px 14px;
+  border-radius: 10px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.current-stop-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.next-arrow-pulse {
+  color: var(--accent-gold);
+  font-size: 13px;
+  animation: arrowBounce 1s infinite alternate ease-in-out;
+}
+
+@keyframes arrowBounce {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(4px); }
+}
+
+.next-stop-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.next-stop-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.next-stop-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  color: #38bdf8;
+}
+
+.next-stop-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  color: #ffffff;
+}
+
+.next-stop-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.next-stop-meter-bg {
+  width: 90px;
+  height: 5px;
+  background: #10131a;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid #2b3342;
+}
+
+.next-stop-meter-fill {
+  height: 100%;
+  width: 25%;
+  background: linear-gradient(90deg, #38bdf8, #2ecc71);
+  transition: width 0.15s ease-out;
+}
+
+.next-distance-text {
+  font-size: 9.5px;
+  color: var(--accent-gold);
+}
+
+/* Right HUD Actions */
+.hud-actions {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 1vw, 10px);
+  flex-shrink: 0;
+}
+
+/* Permanent Glowing Resume Button (Always Visible) */
+.hud-resume-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(180deg, #f1c40f 0%, #d4ac0d 100%);
+  color: #12141a;
+  border: 2px solid #ffffff;
+  padding: 6px clamp(8px, 1.2vw, 12px);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(7px, 0.9vw, 8.5px);
+  font-weight: bold;
+  box-shadow: 0 3px 0 #8e730a, 0 0 10px rgba(241, 196, 15, 0.4);
+  transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
+  text-decoration: none;
+  white-space: nowrap;
+  animation: resumePulse 2.5s infinite alternate ease-in-out;
+}
+
+@keyframes resumePulse {
+  0% { box-shadow: 0 3px 0 #8e730a, 0 0 6px rgba(241, 196, 15, 0.3); }
+  100% { box-shadow: 0 3px 0 #8e730a, 0 0 14px rgba(241, 196, 15, 0.85); }
+}
+
+.hud-resume-btn:hover {
+  background: #f39c12;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 #8e730a, 0 0 16px rgba(243, 156, 18, 0.95);
+}
+
+.hud-resume-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #8e730a;
+}
+
+.hero-passport-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #d4af37;
+  color: #12141a;
+  border: 2px solid #f1c40f;
+  padding: 6px clamp(6px, 1vw, 10px);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(7.5px, 0.9vw, 8.5px);
+  box-shadow: 0 3px 0 #997814;
+  transition: transform 0.1s, box-shadow 0.1s;
+  white-space: nowrap;
+}
+
+.hero-passport-btn:hover {
+  background: #f1c40f;
+  transform: translateY(-1px);
+}
+
+.hero-passport-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #997814;
+}
+
+.coin-counter-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #2a2010;
+  border: 2px solid #b7871b;
+  padding: 5px clamp(6px, 0.8vw, 9px);
+  border-radius: 6px;
+}
+
+.coin-counter-badge span {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(7.5px, 0.9vw, 9px);
+  color: var(--accent-gold);
+}
+
+.hud-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #222733;
+  border: 2px solid #363e52;
+  color: #ffffff;
+  padding: 6px clamp(6px, 0.8vw, 10px);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(7.5px, 0.9vw, 8px);
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.hud-btn:hover {
+  background: #2e3544;
+  border-color: var(--accent-gold);
+}
+
+/* ==========================================================================
+   BOTTOM CONTROLS DECK & WAYPOINT COMPASS
+   ========================================================================== */
+.bottom-control-deck {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: clamp(54px, 7.5vh, 64px);
+  background: rgba(22, 26, 35, 0.96);
+  backdrop-filter: blur(8px);
+  border-top: 3px solid #2e3544;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(10px, 2.5vw, 24px);
+  gap: 8px;
+}
+
+.bottom-deck-left {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 1vw, 10px);
+  flex-shrink: 0;
+}
+
+.waypoint-compass-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1a202c;
+  border: 2px solid #3b82f6;
+  border-radius: 20px;
+  padding: 5px clamp(10px, 1.8vw, 16px);
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+  max-width: 60vw;
+  overflow: hidden;
+}
+
+.waypoint-compass-pill:hover {
+  border-color: var(--accent-gold);
+  transform: translateY(-1px);
+}
+
+.compass-icon {
+  font-size: clamp(13px, 1.8vw, 16px);
+  animation: compassSpin 6s infinite linear;
+  flex-shrink: 0;
+}
+
+@keyframes compassSpin {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(180deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.compass-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(7px, 1vw, 8.5px);
+  color: #38bdf8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compass-action {
+  font-size: 10px;
+  color: var(--accent-gold);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.rpg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #2c3444;
+  border: 2px solid #47536d;
+  color: #ffffff;
+  padding: clamp(8px, 1vw, 10px) clamp(10px, 1.5vw, 16px);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(7.5px, 0.9vw, 9px);
+  box-shadow: 0 4px 0 #1b212c;
+  transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
+  text-decoration: none;
+  min-height: 38px;
+  white-space: nowrap;
+}
+
+.rpg-btn:hover {
+  background: #394357;
+  border-color: var(--accent-gold);
+}
+
+.rpg-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #1b212c;
+}
+
+.rpg-btn.primary {
+  background: #27ae60;
+  border-color: #2ecc71;
+  box-shadow: 0 4px 0 #196f3d;
+}
+
+.rpg-btn.primary:hover {
+  background: #2ecc71;
+}
+
+.rpg-btn.gold {
+  background: #d4ac0d;
+  border-color: #f1c40f;
+  box-shadow: 0 4px 0 #9a7d0a;
+  color: #1a1a1a;
+}
+
+.control-hint {
+  font-family: 'Fira Code', monospace;
+  font-size: clamp(9px, 1vw, 11px);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   RPG DIALOG MODAL / QUEST DRAWER (Responsive for All Screens)
+   ========================================================================== */
+.rpg-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 12, 16, 0.85);
+  backdrop-filter: blur(6px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(8px, 2vw, 20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease-out;
+}
+
+.rpg-modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.rpg-modal-box {
+  background: #1c212b;
+  border: 4px solid #3c465a;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 720px;
+  max-height: 88vh;
+  box-shadow: 
+    0 10px 0 #10131a,
+    0 25px 40px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(20px) scale(0.96);
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.rpg-modal-backdrop.open .rpg-modal-box {
+  transform: translateY(0) scale(1);
+}
+
+/* Modal Title Header */
+.modal-header {
+  background: #252c3a;
+  padding: clamp(10px, 1.5vw, 14px) clamp(12px, 2vw, 20px);
+  border-bottom: 3px solid #3c465a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.modal-station-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(7.5px, 0.9vw, 9px);
+  background: var(--accent-gold);
+  color: #12141a;
+  padding: 3px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.modal-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(9px, 1.3vw, 12px);
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-close-btn {
+  background: #e74c3c;
+  border: 2px solid #c0392b;
+  color: #ffffff;
+  width: clamp(28px, 4vw, 32px);
+  height: clamp(28px, 4vw, 32px);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 0 #962d22;
+  flex-shrink: 0;
+}
+
+.modal-close-btn:hover {
+  background: #ff5252;
+}
+
+/* Modal Body */
+.modal-body {
+  padding: clamp(12px, 2vw, 22px);
+  overflow-y: auto;
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+.modal-body::-webkit-scrollbar-track {
+  background: #141720;
+}
+.modal-body::-webkit-scrollbar-thumb {
+  background: #363e52;
+  border-radius: 3px;
+}
+
+/* ==========================================================================
+   HERO GUILD ADVENTURER PASSPORT (Responsive Holographic Card)
+   ========================================================================== */
+.hero-passport-card {
+  position: relative;
+  background: linear-gradient(135deg, #1e2433 0%, #151922 100%);
+  border: 4px solid #d4af37;
+  border-radius: 14px;
+  padding: clamp(14px, 2vw, 22px);
+  overflow: hidden;
+  box-shadow: 
+    0 8px 0 #10131a,
+    0 15px 30px rgba(0, 0, 0, 0.6);
+}
+
+.hero-passport-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.12) 45%,
+    rgba(241, 196, 15, 0.25) 50%,
+    rgba(56, 189, 248, 0.25) 55%,
+    transparent 65%
+  );
+  transform: rotate(-25deg);
+  pointer-events: none;
+  animation: foilShimmer 7s infinite linear;
+}
+
+@keyframes foilShimmer {
+  0% { transform: translateY(-50%) rotate(-25deg); }
+  100% { transform: translateY(50%) rotate(-25deg); }
+}
+
+.passport-top-row {
+  display: flex;
+  gap: clamp(12px, 2vw, 20px);
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.passport-photo-frame {
+  position: relative;
+  width: clamp(100px, 18vw, 135px);
+  height: clamp(115px, 21vw, 155px);
+  border-radius: 10px;
+  border: 3px solid #f1c40f;
+  overflow: hidden;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.5);
+  flex-shrink: 0;
+  background: #2a3140;
+}
+
+.passport-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+.passport-verified-stamp {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: #27ae60;
+  color: #ffffff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5.5px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  border: 1px solid #2ecc71;
+}
+
+.passport-identity {
+  display: flex;
+  flex-direction: column;
+}
+
+.passport-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(12px, 2vw, 15px);
+  color: #f1c40f;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
+.passport-class {
+  font-size: clamp(11.5px, 1.5vw, 13px);
+  color: #38bdf8;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.passport-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+.stat-item {
+  background: #141720;
+  padding: 5px 8px;
+  border-radius: 5px;
+  border: 1px solid #2e3544;
+}
+
+.stat-label {
+  font-size: 9px;
+  color: var(--text-muted);
+}
+
+.stat-val {
+  font-weight: bold;
+  color: #ffffff;
+  font-size: 11px;
+}
+
+.passport-quote-box {
+  background: #141720;
+  border-left: 3px solid var(--accent-gold);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: clamp(11px, 1.4vw, 12px);
+  color: #cbd5e1;
+  line-height: 1.55;
+  margin-bottom: 16px;
+}
+
+.passport-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Project Cards in Modal */
+.quest-projects-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.quest-project-card {
+  background: #232936;
+  border: 2px solid #363e52;
+  border-radius: 10px;
+  padding: 14px;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.quest-project-card:hover {
+  border-color: var(--accent-gold);
+}
+
+.project-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.project-name-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.project-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(9.5px, 1.3vw, 11px);
+  color: #ffffff;
+}
+
+.project-badge {
+  font-size: 9.5px;
+  background: #2c3444;
+  color: var(--accent-gold);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #444e66;
+}
+
+.project-description {
+  font-size: clamp(11.5px, 1.4vw, 12.5px);
+  line-height: 1.55;
+  color: #cbd5e1;
+  margin-bottom: 10px;
+}
+
+.tech-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.tech-tag {
+  background: #171a22;
+  border: 1px solid #323a4c;
+  color: #38bdf8;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+}
+
+/* Skills Inventory in Modal */
+.inventory-section {
+  margin-bottom: 18px;
+}
+
+.inventory-section-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(8.5px, 1.2vw, 10px);
+  color: var(--accent-gold);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.inventory-slot {
+  background: #232936;
+  border: 2px solid #363e52;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.slot-name-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.slot-progress-bg {
+  width: 100%;
+  height: 5px;
+  background: #141720;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.slot-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3498db, #2ecc71);
+}
+
+/* Battle Arena Achievements */
+.battle-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.battle-trophy-card {
+  background: #232936;
+  border: 2px solid #363e52;
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+}
+
+.battle-icon {
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+
+.battle-score {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  color: var(--accent-gold);
+  margin-bottom: 4px;
+}
+
+.battle-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 5px;
+}
+
+.battle-desc {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   BREAKPOINTS & RESPONSIVE RULES
+   ========================================================================== */
+
+/* Tablets & Small Laptops (< 850px) */
+@media (max-width: 850px) {
+  .hud-next-stop-tracker {
+    display: none; /* Hide top center tracker; prominently shown in bottom compass */
+  }
+
+  .control-hint {
+    display: none;
+  }
+}
+
+/* Mobile Devices (< 600px) */
+@media (max-width: 600px) {
+  .top-hud-bar {
+    padding: 0 10px;
+    height: 54px;
+  }
+
+  .player-xp-container {
+    display: none; /* Keep player chip compact */
+  }
+
+  .player-name {
+    font-size: 8px;
+  }
+
+  .player-lvl-badge {
+    font-size: 7px;
+  }
+
+  .hud-resume-btn {
+    padding: 5px 8px;
+    font-size: 7px;
+  }
+
+  .hero-passport-btn span:last-child {
+    display: none; /* Shows icon 📜 on small screens */
+  }
+
+  .hud-btn span:last-child {
+    display: none; /* Shows icon 🔊 on small screens */
+  }
+
+  .bottom-control-deck {
+    height: 56px;
+    padding: 0 8px;
+  }
+
+  .bottom-control-deck .rpg-btn.gold {
+    display: none; /* Prominently fixed in Top HUD on small screens */
+  }
+
+  .rpg-btn {
+    padding: 8px 10px;
+    font-size: 8px;
+  }
+
+  .passport-top-row {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .passport-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inventory-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .battle-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Extra Small Phones (< 380px) */
+@media (max-width: 380px) {
+  .player-meta {
+    display: none;
+  }
+
+  .waypoint-compass-pill {
+    padding: 4px 8px;
+  }
+
+  .compass-text {
+    font-size: 6.5px;
+  }
+}

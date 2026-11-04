@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>Padmasri Chikle | Fullscreen Gamified Roadmap Portfolio</title>
+  <meta name="description" content="Fullscreen 8-bit RPG Roadmap Portfolio of Padmasri Chikle — AI/ML & Full-Stack Developer at Mirai School of Technology. Featuring scroll-driven character movement, dynamic Next Stop tracker, and interactive photo monuments.">
+  
+  <!-- Retro Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Pixelify+Sans:wght@500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="./css/main.css">
+  <link rel="stylesheet" href="./css/roadmap.css">
+</head>
+<body>
+
+  <!-- Subtle CRT Scanline Filter -->
+  <div id="crt-overlay"></div>
+
+  <!-- ==========================================================================
+       TOP RPG HUD BAR (Sticky at Top)
+       ========================================================================== -->
+  <header class="top-hud-bar">
+    <!-- Player Profile Chip with Real Photo -->
+    <div class="player-hud-chip" id="player-hud-chip" title="Click to view Hero Passport & Stats">
+      <div class="player-avatar-mini">
+        <img src="./assets/padmasri.jpg" alt="Padmasri Chikle" class="player-avatar-img">
+        <span class="online-beacon" title="Online Level 22"></span>
+      </div>
+      <div class="player-meta">
+        <div class="player-name-row">
+          <span class="player-name">PADMASRI</span>
+          <span class="player-lvl-badge">LVL 22</span>
+        </div>
+        <div class="player-xp-container">
+          <div class="xp-bar-bg">
+            <div class="xp-bar-fill" id="hud-xp-fill"></div>
+          </div>
+          <span class="xp-text">AI ENGINEER</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic Next Stop Tracker (Center of HUD) -->
+    <div class="hud-next-stop-tracker">
+      <div class="current-stop-tag">
+        <span>📍</span>
+        <span id="current-stop-name">START: ORIGIN</span>
+      </div>
+      <span class="next-arrow-pulse">➔</span>
+      <div class="next-stop-content">
+        <div class="next-stop-title-row">
+          <span class="next-stop-label">NEXT STOP:</span>
+          <span class="next-stop-name" id="next-stop-name">01 • ACADEMY</span>
+        </div>
+        <div class="next-stop-progress-row">
+          <div class="next-stop-meter-bg">
+            <div class="next-stop-meter-fill" id="next-meter-fill"></div>
+          </div>
+          <span class="next-distance-text" id="next-distance-text">20% to stop</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="hud-actions">
+      <!-- Permanent Glowing Resume Button (Always Visible On-Screen) -->
+      <a href="https://drive.google.com/file/d/1cT9AdrHuSwM93CPUsjus9PfUzDXhagcT/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="hud-resume-btn" title="View / Download Padmasri's Resume">
+        <span>📄</span>
+        <span>RESUME</span>
+      </a>
+
+      <!-- Hero Passport Button -->
+      <button class="hero-passport-btn" id="btn-hero-passport" title="Open Official Guild Adventurer Passport">
+        <span>📜</span>
+        <span>HERO CARD</span>
+      </button>
+
+      <!-- Hidden Coins Counter -->
+      <div class="coin-counter-badge" title="Hidden Coins Found in Field">
+        <span>🪙</span>
+        <span id="coin-counter-val">0/5</span>
+      </div>
+
+      <!-- Audio Mute / Unmute Button -->
+      <button id="btn-sound-toggle" class="hud-btn" title="Toggle 8-bit Audio">
+        <span>🔊</span>
+        <span>SOUND ON</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       FULLSCREEN ROADMAP CONTAINER
+       ========================================================================== -->
+  <div class="roadmap-container">
+
+    <!-- Sticky Full-Screen Viewport -->
+    <div class="roadmap-viewport" id="roadmap-viewport">
+
+      <!-- Panning World Map (Centering on Player) -->
+      <div class="roadmap-world" id="roadmap-world">
+
+        <!-- SVG Map Layer (ViewBox: 0 0 1000 2000) -->
+        <svg class="roadmap-svg" viewBox="0 0 1000 2000" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grass-pattern" width="36" height="36" patternUnits="userSpaceOnUse">
+              <rect width="36" height="36" fill="#6db33f" />
+              <rect x="0" y="0" width="18" height="18" fill="#75bb44" opacity="0.6" />
+              <rect x="18" y="18" width="18" height="18" fill="#65ab3a" opacity="0.6" />
+              <rect x="8" y="12" width="2" height="5" fill="#52992b" />
+              <rect x="10" y="10" width="2" height="7" fill="#4d9127" />
+              <rect x="26" y="28" width="2" height="5" fill="#52992b" />
+              <rect x="28" y="26" width="2" height="7" fill="#4d9127" />
+            </pattern>
+
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#000" flood-opacity="0.35"/>
+            </filter>
+          </defs>
+
+          <!-- Background Field -->
+          <rect width="1000" height="2000" fill="url(#grass-pattern)" />
+
+          <!-- ==========================================
+               WINDING ROAD (ViewBox: 0 0 1000 2000)
+               ========================================== -->
+          <path class="road-outer-border" 
+                d="M 330 1820 C 380 1740 480 1680 520 1520 C 560 1380 480 1260 340 1150 C 230 1060 320 920 460 840 C 520 800 620 740 680 620 C 720 540 740 380 770 200" />
+
+          <path class="road-curb" 
+                d="M 330 1820 C 380 1740 480 1680 520 1520 C 560 1380 480 1260 340 1150 C 230 1060 320 920 460 840 C 520 800 620 740 680 620 C 720 540 740 380 770 200" />
+
+          <path class="road-asphalt" 
+                d="M 330 1820 C 380 1740 480 1680 520 1520 C 560 1380 480 1260 340 1150 C 230 1060 320 920 460 840 C 520 800 620 740 680 620 C 720 540 740 380 770 200" />
+
+          <path id="roadmap-svg-path" class="road-center-line" 
+                d="M 330 1820 C 380 1740 480 1680 520 1520 C 560 1380 480 1260 340 1150 C 230 1060 320 920 460 840 C 520 800 620 740 680 620 C 720 540 740 380 770 200" />
+
+          <!-- ==========================================
+               TITLE: "ROAD MAP" (Top Left)
+               Recreation matching reference image
+               ========================================== -->
+          <g id="title-road-map" transform="translate(80, 50)" filter="url(#shadow)">
+            <!-- "ROAD" Letters -->
+            <g transform="translate(40, 20)">
+              <path d="M 0 0 H 42 V 32 H 30 V 42 H 44 V 68 H 28 L 18 42 H 14 V 68 H 0 Z" fill="#1b1c20" transform="translate(6, 6)"/>
+              <path d="M 0 0 H 42 V 32 H 30 V 42 H 44 V 68 H 28 L 18 42 H 14 V 68 H 0 Z" fill="#e74c3c" />
+              <rect x="14" y="14" width="14" height="14" fill="#6db33f" />
+              <rect x="2" y="2" width="38" height="6" fill="#f1948a" />
+              <rect x="2" y="2" width="6" height="64" fill="#f1948a" />
+            </g>
+            <g transform="translate(100, 20)">
+              <path d="M 6 0 H 36 V 6 H 42 V 62 H 36 V 68 H 6 V 62 H 0 V 6 H 6 Z" fill="#1b1c20" transform="translate(6, 6)"/>
+              <path d="M 6 0 H 36 V 6 H 42 V 62 H 36 V 68 H 6 V 62 H 0 V 6 H 6 Z" fill="#58d68d" />
+              <rect x="14" y="16" width="14" height="36" fill="#6db33f" />
+              <rect x="6" y="2" width="30" height="6" fill="#a9dfbf" />
+              <rect x="2" y="6" width="6" height="54" fill="#a9dfbf" />
+            </g>
+            <g transform="translate(160, 20)">
+              <path d="M 6 0 H 36 V 6 H 42 V 68 H 28 V 44 H 14 V 68 H 0 V 6 H 6 Z" fill="#1b1c20" transform="translate(6, 6)"/>
+              <path d="M 6 0 H 36 V 6 H 42 V 68 H 28 V 44 H 14 V 68 H 0 V 6 H 6 Z" fill="#5dade2" />
+              <rect x="14" y="16" width="14" height="14" fill="#6db33f" />
+              <rect x="6" y="2" width="30" height="6" fill="#aed6f1" />
+              <rect x="2" y="6" width="6" height="60" fill="#aed6f1" />
+            </g>
+            <g transform="translate(220, 20)">
+              <path d="M 0 0 H 34 V 6 H 42 V 62 H 34 V 68 H 0 Z" fill="#1b1c20" transform="translate(6, 6)"/>
+              <path d="M 0 0 H 34 V 6 H 42 V 62 H 34 V 68 H 0 Z" fill="#d4ac0d" />
+              <rect x="14" y="16" width="14" height="36" fill="#6db33f" />
+              <rect x="2" y="2" width="32" height="6" fill="#f9e79f" />
+              <rect x="2" y="2" width="6" height="64" fill="#f9e79f" />
+              <g transform="translate(16, -16)">
+                <ellipse cx="10" cy="8" rx="10" ry="7" fill="#e74c3c" />
+                <circle cx="6" cy="6" r="2" fill="#ffffff" />
+                <circle cx="14" cy="7" r="2" fill="#ffffff" />
+                <rect x="8" y="11" width="4" height="6" fill="#f5eef8" />
+              </g>
+            </g>
+
+            <!-- Parchment Map Scroll -->
+            <g transform="translate(0, 95)">
+              <rect x="6" y="6" width="68" height="54" rx="6" fill="#1b1c20" />
+              <rect x="2" y="2" width="68" height="54" rx="6" fill="#f5cba7" stroke="#b9770e" stroke-width="3" />
+              <path d="M 12 18 C 24 12, 34 36, 58 24" fill="none" stroke="#3498db" stroke-width="4" stroke-linecap="round" />
+              <circle cx="50" cy="40" r="10" fill="#ffffff" stroke="#7e5109" stroke-width="2" />
+              <polygon points="50,33 53,40 50,47 47,40" fill="#e74c3c" />
+              <polygon points="43,40 50,43 57,40 50,37" fill="#2c3e50" />
+            </g>
+
+            <!-- "MAP" Letters -->
+            <g transform="translate(90, 100)">
+              <path d="M 0 0 H 14 L 23 28 L 32 0 H 46 V 68 H 32 V 26 L 24 46 H 22 L 14 26 V 68 H 0 Z" fill="#1b1c20" transform="translate(6, 6)"/>
+              <path d="M 0 0 H 14 L 23 28 L 32 0 H 46 V 68 H 32 V 26 L 24 46 H 22 L 14 26 V 68 H 0 Z" fill="#ec7063" />
+              <rect x="2" y="2" width="10" height="6" fill="#fadbd8" />
+              <g transform="translate(14, -18)">
+                <ellipse cx="10" cy="8" rx="11" ry="8" fill="#e74c3c" />
+                <circle cx="5" cy="6" r="2.5" fill="#ffffff" />
+                <circle cx="13" cy="6" r="2.5" fill="#ffffff" />
+                <rect x="8" y="12" width="4" height="6" fill="#fbfcfc" />
+              </g>
+            </g>
+            <g transform="translate(150, 100)">
+              <path d="M 6 0 H 36 V 6 H 42 V 68 H 28 V 44 H 14 V 68 H 0 V 6 H 6 Z" fill="#1b1c20" transform="translate(6, 6)"/>
+              <path d="M 6 0 H 36 V 6 H 42 V 68 H 28 V 44 H 14 V 68 H 0 V 6 H 6 Z" fill="#f4d03f" />
+              <rect x="14" y="16" width="14" height="14" fill="#6db33f" />
+              <rect x="6" y="2" width="30" height="6" fill="#fef9e7" />
+              <rect x="2" y="6" width="6" height="60" fill="#fef9e7" />
+            </g>
+            <g transform="translate(210, 100)">
+              <path d="M 0 0 H 40 V 38 H 14 V 68 H 0 Z" fill="#1b1c20" transform="translate(6, 6)"/>
+              <path d="M 0 0 H 40 V 38 H 14 V 68 H 0 Z" fill="#82e0aa" />
+              <rect x="14" y="12" width="14" height="14" fill="#6db33f" />
+              <rect x="2" y="2" width="36" height="6" fill="#d5f5e3" />
+              <rect x="2" y="2" width="6" height="64" fill="#d5f5e3" />
+            </g>
+          </g>
+
+          <!-- Scenery: Trees, Logs, Sunflowers -->
+          <!-- Pine Trees (Left) -->
+          <g id="pine-trees-left" transform="translate(80, 950)" filter="url(#shadow)">
+            <rect x="36" y="86" width="10" height="24" fill="#6e2c00" />
+            <polygon points="41,35 74,90 8,90" fill="#145a32" />
+            <polygon points="41,35 68,90 14,90" fill="#1e8449" />
+            <polygon points="41,35 52,90 30,90" fill="#2ecc71" />
+            <polygon points="41,15 64,60 18,60" fill="#196f3d" />
+            <polygon points="41,15 58,60 24,60" fill="#27ae60" />
+            <polygon points="41,0 52,35 30,35" fill="#2ecc71" />
+            <polygon points="41,0 48,35 34,35" fill="#58d68d" />
+          </g>
+
+          <!-- Pine Trees (Right) -->
+          <g id="pine-trees-mid-right" transform="translate(600, 1250)" filter="url(#shadow)">
+            <rect x="36" y="86" width="10" height="24" fill="#6e2c00" />
+            <polygon points="41,35 74,90 8,90" fill="#145a32" />
+            <polygon points="41,35 68,90 14,90" fill="#1e8449" />
+            <polygon points="41,35 52,90 30,90" fill="#2ecc71" />
+            <polygon points="41,15 64,60 18,60" fill="#196f3d" />
+            <polygon points="41,15 58,60 24,60" fill="#27ae60" />
+            <polygon points="41,0 52,35 30,35" fill="#2ecc71" />
+            <polygon points="41,0 48,35 34,35" fill="#58d68d" />
+          </g>
+
+          <!-- Wood Cut Logs -->
+          <g id="wood-logs" transform="translate(180, 560)" filter="url(#shadow)">
+            <rect x="18" y="0" width="55" height="18" rx="8" fill="#784212" />
+            <ellipse cx="20" cy="9" rx="8" ry="9" fill="#d35400" stroke="#512e10" stroke-width="2" />
+            <rect x="0" y="12" width="60" height="20" rx="9" fill="#873600" />
+            <ellipse cx="8" cy="22" rx="8" ry="10" fill="#e59866" stroke="#512e10" stroke-width="2" />
+            <ellipse cx="8" cy="22" rx="4" ry="5" fill="#ba4a00" />
+          </g>
+
+          <!-- Sunflowers (Right) -->
+          <g id="sunflowers-right" transform="translate(740, 480)" filter="url(#shadow)">
+            <path d="M 12 25 Q 14 45, 12 70" stroke="#1e8449" stroke-width="4" fill="none" />
+            <path d="M 12 45 Q 22 40, 18 52" fill="#27ae60" />
+            <circle cx="12" cy="22" r="14" fill="#f1c40f" />
+            <circle cx="12" cy="22" r="8" fill="#784212" />
+          </g>
+
+          <!-- Sunflowers (Bottom Left) -->
+          <g id="sunflowers-bottom-left" transform="translate(160, 1400)" filter="url(#shadow)">
+            <path d="M 12 25 Q 8 45, 10 70" stroke="#1e8449" stroke-width="4" fill="none" />
+            <circle cx="12" cy="22" r="14" fill="#f1c40f" />
+            <circle cx="12" cy="22" r="8" fill="#784212" />
+          </g>
+        </svg>
+
+        <!-- ==========================================
+             TOP-RIGHT: GOLDEN TROPHY SUMMIT
+             ========================================== -->
+        <div class="trophy-container" id="summit-trophy" style="left: 77%; top: 5%;">
+          <svg width="84" height="84" viewBox="0 0 48 48">
+            <rect x="10" y="38" width="28" height="8" rx="4" fill="#1b1c20" opacity="0.4"/>
+            <rect x="12" y="34" width="24" height="6" rx="2" fill="#784212" stroke="#4e2b0b" stroke-width="2"/>
+            <rect x="16" y="28" width="16" height="6" fill="#a0522d" />
+            <path d="M 8 6 H 40 V 16 C 40 26, 32 30, 24 30 C 16 30, 8 26, 8 16 Z" fill="#f1c40f" stroke="#b7950b" stroke-width="2"/>
+            <path d="M 12 8 H 36 V 16 C 36 24, 30 27, 24 27 C 18 27, 12 24, 12 16 Z" fill="#f39c12" />
+            <path d="M 14 10 H 22 V 22 C 18 20, 14 18, 14 10 Z" fill="#fef9e7" />
+            <path d="M 8 10 C 2 10, 2 20, 10 22" fill="none" stroke="#f1c40f" stroke-width="4" stroke-linecap="round"/>
+            <path d="M 40 10 C 46 10, 46 20, 38 22" fill="none" stroke="#f1c40f" stroke-width="4" stroke-linecap="round"/>
+            <polygon points="24,13 26,17 30,17 27,20 28,24 24,22 20,24 21,20 18,17 22,17" fill="#ffffff" />
+          </svg>
+          <div class="trophy-sparkle" style="top: 0; left: 8px;">✨</div>
+          <div class="trophy-sparkle" style="bottom: 12px; right: 0; animation-delay: 0.8s;">⭐</div>
+        </div>
+
+        <!-- ==========================================
+             MILESTONE PINS & CARDS
+             ========================================== -->
+        <!-- Milestone 1 (Bottom Right): Academy & Education -->
+        <div class="milestone-pin-container" data-station="1" style="left: 52%; top: 76%;">
+          <svg class="milestone-pin-svg" viewBox="0 0 32 42">
+            <path d="M 16 0 C 7.2 0, 0 7.2, 0 16 C 0 28, 16 42, 16 42 C 16 42, 32 28, 32 16 C 32 7.2, 24.8 0, 16 0 Z" fill="#e74c3c" stroke="#922b21" stroke-width="2"/>
+            <circle cx="16" cy="15" r="7" fill="#ffffff" />
+            <circle cx="16" cy="15" r="4" fill="#c0392b" />
+          </svg>
+        </div>
+        <div class="milestone-card-overlay" id="card-education" data-station="1" style="left: 56%; top: 77.5%;">
+          <span class="card-step-badge">01 • ACADEMY</span>
+          <div class="card-title">EDUCATION</div>
+          <div class="card-subtitle">Mirai School of Tech • B.E. in AI/ML (2025–Present)</div>
+          <div class="card-action-hint"><span>Inspect Quest</span><span>▶</span></div>
+        </div>
+
+        <!-- Milestone 2 (Mid Left): Tech Arsenal & Skills -->
+        <div class="milestone-pin-container" data-station="2" style="left: 34%; top: 57.5%;">
+          <svg class="milestone-pin-svg" viewBox="0 0 32 42">
+            <path d="M 16 0 C 7.2 0, 0 7.2, 0 16 C 0 28, 16 42, 16 42 C 16 42, 32 28, 32 16 C 32 7.2, 24.8 0, 16 0 Z" fill="#e74c3c" stroke="#922b21" stroke-width="2"/>
+            <circle cx="16" cy="15" r="7" fill="#ffffff" />
+            <circle cx="16" cy="15" r="4" fill="#c0392b" />
+          </svg>
+        </div>
+        <div class="milestone-card-overlay" id="card-skills" data-station="2" style="left: 12%; top: 59%;">
+          <span class="card-step-badge">02 • ARSENAL</span>
+          <div class="card-title">TECH SKILLS</div>
+          <div class="card-subtitle">React 18, Node.js, C++, Gemini AI, MongoDB</div>
+          <div class="card-action-hint"><span>Inspect Spellbook</span><span>▶</span></div>
+        </div>
+
+        <!-- Milestone 3 (Upper Center): Featured Projects -->
+        <div class="milestone-pin-container" data-station="3" style="left: 56%; top: 40%;">
+          <svg class="milestone-pin-svg" viewBox="0 0 32 42">
+            <path d="M 16 0 C 7.2 0, 0 7.2, 0 16 C 0 28, 16 42, 16 42 C 16 42, 32 28, 32 16 C 32 7.2, 24.8 0, 16 0 Z" fill="#e74c3c" stroke="#922b21" stroke-width="2"/>
+            <circle cx="16" cy="15" r="7" fill="#ffffff" />
+            <circle cx="16" cy="15" r="4" fill="#c0392b" />
+          </svg>
+        </div>
+        <div class="milestone-card-overlay" id="card-projects" data-station="3" style="left: 36%; top: 42%;">
+          <span class="card-step-badge">03 • QUESTS</span>
+          <div class="card-title">FEATURED PROJECTS</div>
+          <div class="card-subtitle">ShopBazar, MovieAdda (AI), CampusFind, Matiks</div>
+          <div class="card-action-hint"><span>Browse 5 Quests</span><span>▶</span></div>
+        </div>
+
+        <!-- Milestone 4 (Mid Right): Battle Arena & Achievements -->
+        <div class="milestone-pin-container" data-station="4" style="left: 70%; top: 28%;">
+          <svg class="milestone-pin-svg" viewBox="0 0 32 42">
+            <path d="M 16 0 C 7.2 0, 0 7.2, 0 16 C 0 28, 16 42, 16 42 C 16 42, 32 28, 32 16 C 32 7.2, 24.8 0, 16 0 Z" fill="#e74c3c" stroke="#922b21" stroke-width="2"/>
+            <circle cx="16" cy="15" r="7" fill="#ffffff" />
+            <circle cx="16" cy="15" r="4" fill="#c0392b" />
+          </svg>
+        </div>
+        <div class="milestone-card-overlay" id="card-achievements" data-station="4" style="left: 64%; top: 30%;">
+          <span class="card-step-badge">04 • BOSS LOGS</span>
+          <div class="card-title">ACHIEVEMENTS</div>
+          <div class="card-subtitle">250+ LeetCode, Codeforces 777, 10 CNCF PRs</div>
+          <div class="card-action-hint"><span>View Trophy Case</span><span>▶</span></div>
+        </div>
+
+        <!-- Milestone 5 (Top Right): Summit & Contact -->
+        <div class="milestone-card-overlay" id="card-contact" data-station="5" style="left: 62%; top: 11%;">
+          <span class="card-step-badge">05 • SUMMIT</span>
+          <div class="card-title">HIRE & CONTACT</div>
+          <div class="card-subtitle">Direct Transmission, Resume & Socials</div>
+          <div class="card-action-hint"><span>Reach Summit</span><span>▶</span></div>
+        </div>
+
+        <!-- ==========================================
+             START AREA: START BUTTON & HERO MONUMENT
+             Unique Photo Shrine directly on the map
+             ========================================== -->
+        <!-- START Button -->
+        <div class="start-button-overlay start-pulse" id="start-btn-overlay" style="left: 6%; top: 88%;">
+          <span class="start-button-text">START</span>
+        </div>
+
+        <!-- Unique Hero Photo Shrine (Origin Monument) -->
+        <div class="hero-origin-shrine" id="hero-origin-shrine" style="left: 6%; top: 78%;" title="Click to inspect Hero Profile">
+          <span class="shrine-badge">REAL-WORLD ARCHITECT</span>
+          <div class="shrine-photo-frame">
+            <img src="./assets/padmasri.jpg" alt="Padmasri Chikle" class="shrine-photo">
+          </div>
+          <div class="shrine-title">PADMASRI CHIKLE</div>
+          <div class="shrine-sub">AI/ML Engineer</div>
+          <div class="shrine-action-hint"><span>[Inspect Hero Card]</span></div>
+        </div>
+
+        <!-- Player Character Sprite on Road -->
+        <div class="player-character-container" id="player-character" style="left: 33%; top: 91%;">
+          <!-- Floating Waypoint Speech Bubble -->
+          <div class="character-speech-bubble" id="character-speech">
+            <span>🚀</span>
+            <span>Next: 01 Academy ➔</span>
+          </div>
+
+          <!-- Character Sprite -->
+          <svg class="player-character-sprite" viewBox="0 0 32 40">
+            <rect x="9" y="4" width="14" height="10" fill="#f5b041" />
+            <rect x="7" y="8" width="18" height="14" fill="#f4d03f" />
+            <rect x="9" y="8" width="14" height="10" fill="#fdebd0" />
+            <rect x="11" y="11" width="3" height="3" fill="#2c3e50" />
+            <rect x="18" y="11" width="3" height="3" fill="#2c3e50" />
+            <rect x="8" y="18" width="16" height="5" fill="#e74c3c" />
+            <rect x="12" y="21" width="5" height="5" fill="#c0392b" />
+            <rect x="8" y="22" width="16" height="11" fill="#8e44ad" />
+            <rect x="7" y="28" width="18" height="5" fill="#6c3483" />
+            <rect x="9" y="33" width="5" height="5" fill="#2c3e50" />
+            <rect x="18" y="33" width="5" height="5" fill="#2c3e50" />
+          </svg>
+        </div>
+
+        <!-- Secret Interactive Coins in Meadow -->
+        <div class="secret-coin" style="left: 20%; top: 48%;" title="Secret Coin! Click for +130 XP">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#f1c40f" stroke="#b7950b" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="#f39c12"/><rect x="11" y="8" width="2" height="8" fill="#ffffff"/></svg>
+        </div>
+        <div class="secret-coin" style="left: 48%; top: 68%;" title="Secret Coin! Click for +130 XP">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#f1c40f" stroke="#b7950b" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="#f39c12"/><rect x="11" y="8" width="2" height="8" fill="#ffffff"/></svg>
+        </div>
+        <div class="secret-coin" style="left: 82%; top: 52%;" title="Secret Coin! Click for +130 XP">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#f1c40f" stroke="#b7950b" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="#f39c12"/><rect x="11" y="8" width="2" height="8" fill="#ffffff"/></svg>
+        </div>
+        <div class="secret-coin" style="left: 64%; top: 22%;" title="Secret Coin! Click for +130 XP">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#f1c40f" stroke="#b7950b" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="#f39c12"/><rect x="11" y="8" width="2" height="8" fill="#ffffff"/></svg>
+        </div>
+        <div class="secret-coin" style="left: 24%; top: 82%;" title="Secret Coin! Click for +130 XP">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#f1c40f" stroke="#b7950b" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="#f39c12"/><rect x="11" y="8" width="2" height="8" fill="#ffffff"/></svg>
+        </div>
+
+        <!-- Mario-style Red Brick Platform at Bottom -->
+        <div class="bottom-brick-platform"></div>
+
+        <!-- Pacing Raccoon Mascot -->
+        <div class="mascot-raccoon">
+          <svg viewBox="0 0 44 24">
+            <ellipse cx="22" cy="14" rx="14" ry="7" fill="#7f8c8d" />
+            <ellipse cx="14" cy="14" rx="8" ry="6" fill="#bdc3c7" />
+            <circle cx="34" cy="11" r="6" fill="#7f8c8d" />
+            <rect x="32" y="9" width="7" height="3" rx="1" fill="#2c3e50" />
+            <circle cx="36" cy="10" r="1" fill="#ffffff" />
+            <polygon points="32,6 35,2 36,6" fill="#7f8c8d" />
+            <polygon points="36,6 38,2 39,6" fill="#7f8c8d" />
+            <path d="M 8 13 C 2 12, 0 16, 2 18 C 5 20, 9 17, 10 14" fill="#34495e" stroke="#2c3e50" stroke-width="1.5"/>
+            <line x1="4" y1="13" x2="6" y2="17" stroke="#ecf0f1" stroke-width="2"/>
+            <rect x="14" y="20" width="3" height="3" fill="#2c3e50" />
+            <rect x="26" y="20" width="3" height="3" fill="#2c3e50" />
+          </svg>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Scroll Track (Drives scroll movement across 420vh) -->
+    <div class="scroll-track"></div>
+  </div>
+
+  <!-- ==========================================================================
+       BOTTOM CONTROLS DECK & WAYPOINT COMPASS
+       ========================================================================== -->
+  <footer class="bottom-control-deck">
+    <div class="bottom-deck-left">
+      <button class="rpg-btn" id="btn-prev-milestone">◀ PREV</button>
+      <button class="rpg-btn primary" id="btn-next-milestone">NEXT ▶</button>
+    </div>
+
+    <!-- Floating Waypoint Compass Button -->
+    <div class="waypoint-compass-pill" id="waypoint-compass-pill" title="Click to auto-travel to next stop">
+      <span class="compass-icon">🧭</span>
+      <span class="compass-text" id="compass-text">NEXT STOP: 01 • ACADEMY</span>
+      <span class="compass-action">Travel ▶</span>
+    </div>
+
+    <!-- Persistent Bottom Resume Button -->
+    <a href="https://drive.google.com/file/d/1cT9AdrHuSwM93CPUsjus9PfUzDXhagcT/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="rpg-btn gold" title="View / Download Padmasri's Resume">
+      <span>📄</span>
+      <span>RESUME ↗</span>
+    </a>
+
+    <span class="control-hint">Scroll down / up to travel • Press [P] for Hero Card</span>
+  </footer>
+
+  <!-- ==========================================================================
+       RPG MODAL (Hero Passport & Milestone Drawers)
+       ========================================================================== -->
+  <div class="rpg-modal-backdrop" id="rpg-modal">
+    <div class="rpg-modal-box">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <span class="modal-station-tag" id="modal-station-tag">HERO PASSPORT</span>
+          <span class="modal-title" id="modal-title">OFFICIAL GUILD ADVENTURER CARD</span>
+        </div>
+        <button class="modal-close-btn" id="modal-close-btn" aria-label="Close dialog">✕</button>
+      </div>
+
+      <div class="modal-body" id="modal-body-content">
+        <!-- Injected dynamically by roadmap.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>

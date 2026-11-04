@@ -1,0 +1,562 @@
+/* ==========================================================================
+   FULL-SCREEN RESPONSIVE GAMIFIED ROADMAP CSS
+   Optimized for All Devices: Mobile, Tablet, Laptop, Desktop, Ultra-wide
+   ========================================================================== */
+
+/* Fullscreen Container & Scroll Track */
+.roadmap-container {
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #5ea332;
+  overflow-x: hidden;
+}
+
+/* Scroll Track that drives window scrolling */
+.scroll-track {
+  width: 100%;
+  height: 380vh; /* Smooth, natural scroll length */
+  pointer-events: none;
+}
+
+/* Sticky full-screen viewport */
+.roadmap-viewport {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 10;
+  background-color: #6bb33e;
+  background-image: 
+    radial-gradient(#7ec850 15%, transparent 16%),
+    radial-gradient(#5ea332 15%, transparent 16%);
+  background-size: 28px 28px;
+  background-position: 0 0, 14px 14px;
+  pointer-events: none; /* Allows touch swipes on the background to scroll the window */
+}
+
+/* The world map container that smoothly pans in 2D to follow the player */
+.roadmap-world {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(650px, 95vw, 1000px);
+  aspect-ratio: 1000 / 2000;
+  height: auto;
+  transform-origin: top center;
+  transition: transform 0.08s ease-out;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* SVG Map Overlay */
+.roadmap-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.15));
+  pointer-events: none;
+}
+
+/* Road Styles */
+.road-outer-border {
+  fill: none;
+  stroke: #181b22;
+  stroke-width: 108;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.road-curb {
+  fill: none;
+  stroke: #444b5a;
+  stroke-width: 98;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.road-asphalt {
+  fill: none;
+  stroke: #2b2e38;
+  stroke-width: 84;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.road-center-line {
+  fill: none;
+  stroke: #f1f4f8;
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  stroke-dasharray: 14 18;
+  animation: roadPulse 3s linear infinite;
+}
+
+@keyframes roadPulse {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -64; }
+}
+
+/* Character Sprite on Map */
+.player-character-container {
+  position: absolute;
+  width: clamp(48px, 6vw, 64px);
+  height: clamp(58px, 7.5vw, 76px);
+  transform: translate(-50%, -85%);
+  pointer-events: none;
+  z-index: 55;
+  transition: transform 0.08s ease-out;
+  filter: drop-shadow(0 8px 6px rgba(0, 0, 0, 0.4));
+}
+
+.player-character-sprite {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  transform-origin: bottom center;
+}
+
+.player-character-container.facing-left .player-character-sprite {
+  transform: scaleX(-1);
+}
+
+.player-character-container.is-walking .player-character-sprite {
+  animation: characterWalkBob 0.25s infinite alternate ease-in-out;
+}
+
+@keyframes characterWalkBob {
+  0% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-7px) scaleY(1.06); }
+  100% { transform: translateY(-2px) scaleY(0.95); }
+}
+
+.player-character-container.facing-left.is-walking .player-character-sprite {
+  animation: characterWalkBobLeft 0.25s infinite alternate ease-in-out;
+}
+
+@keyframes characterWalkBobLeft {
+  0% { transform: scaleX(-1) translateY(0) scaleY(1); }
+  50% { transform: scaleX(-1) translateY(-7px) scaleY(1.06); }
+  100% { transform: scaleX(-1) translateY(-2px) scaleY(0.95); }
+}
+
+/* Floating Speech Bubble Above Character */
+.character-speech-bubble {
+  position: absolute;
+  bottom: 105%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1c212b;
+  border: 2px solid #f1c40f;
+  border-radius: 8px;
+  padding: 4px 8px;
+  white-space: nowrap;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(6.5px, 0.9vw, 7.5px);
+  color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  animation: bubbleFloat 2s infinite alternate ease-in-out;
+}
+
+.character-speech-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #f1c40f;
+}
+
+@keyframes bubbleFloat {
+  0% { transform: translateX(-50%) translateY(0); }
+  100% { transform: translateX(-50%) translateY(-4px); }
+}
+
+/* START Button on Map */
+.start-button-overlay {
+  position: absolute;
+  cursor: pointer;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #3e7b27;
+  border: 4px solid #1a3c10;
+  border-radius: 12px;
+  padding: clamp(8px, 1.2vw, 12px) clamp(16px, 2.4vw, 24px);
+  box-shadow: 
+    0 6px 0 #142e0b,
+    0 10px 18px rgba(0,0,0,0.35);
+  transition: transform 0.1s, box-shadow 0.1s;
+  pointer-events: auto;
+}
+
+.start-button-overlay:hover {
+  transform: translateY(-2px);
+  background: #4a942e;
+  box-shadow: 0 8px 0 #142e0b, 0 14px 20px rgba(0,0,0,0.4);
+}
+
+.start-button-overlay:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #142e0b, 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.start-button-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(11px, 1.5vw, 15px);
+  color: #ffffff;
+  text-shadow: 2px 2px 0 #1a3c10;
+  letter-spacing: 2px;
+}
+
+.start-pulse {
+  animation: startBounce 1.4s infinite ease-in-out;
+}
+
+@keyframes startBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* ==========================================================================
+   PHOTO MONUMENT AT START (Origin Shrine)
+   ========================================================================== */
+.hero-origin-shrine {
+  position: absolute;
+  z-index: 45;
+  background: #1e2430;
+  border: 4px solid #d4af37;
+  border-radius: 14px;
+  padding: clamp(6px, 1vw, 10px);
+  box-shadow: 
+    0 8px 0 #141720,
+    0 15px 25px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+  width: clamp(120px, 18vw, 170px);
+  text-align: center;
+  pointer-events: auto;
+}
+
+.hero-origin-shrine:hover {
+  transform: translateY(-4px) scale(1.04);
+  box-shadow: 
+    0 12px 0 #141720,
+    0 20px 30px rgba(0, 0, 0, 0.55);
+}
+
+.shrine-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(5.5px, 0.8vw, 7px);
+  background: #d4af37;
+  color: #12141a;
+  padding: 3px 6px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.shrine-photo-frame {
+  position: relative;
+  width: clamp(90px, 14vw, 130px);
+  height: clamp(105px, 16vw, 145px);
+  border: 3px solid #f1c40f;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+  background: #2a3140;
+}
+
+.shrine-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  transition: transform 0.3s ease;
+}
+
+.hero-origin-shrine:hover .shrine-photo {
+  transform: scale(1.08);
+}
+
+.shrine-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(6.5px, 0.9vw, 8px);
+  color: #ffffff;
+  margin-top: 6px;
+  line-height: 1.3;
+}
+
+.shrine-sub {
+  font-size: clamp(8px, 1.1vw, 10px);
+  color: #38bdf8;
+  margin-top: 2px;
+}
+
+.shrine-action-hint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(5px, 0.7vw, 6.5px);
+  color: #f1c40f;
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+   MILESTONE MARKERS & CARDS
+   ========================================================================== */
+.milestone-pin-container {
+  position: absolute;
+  cursor: pointer;
+  z-index: 40;
+  transform: translate(-50%, -100%);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: auto;
+}
+
+.milestone-pin-container:hover {
+  transform: translate(-50%, -115%) scale(1.1);
+}
+
+.milestone-pin-container.active-target {
+  animation: pinBounce 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes pinBounce {
+  0% { transform: translate(-50%, -100%); }
+  100% { transform: translate(-50%, -122%); }
+}
+
+.milestone-pin-svg {
+  width: clamp(32px, 4.5vw, 42px);
+  height: clamp(42px, 5.5vw, 54px);
+  filter: drop-shadow(0 6px 5px rgba(0, 0, 0, 0.4));
+}
+
+.milestone-card-overlay {
+  position: absolute;
+  z-index: 35;
+  background: #e4e7eb;
+  border: 3px solid #23272e;
+  border-radius: 12px;
+  padding: clamp(8px, 1.2vw, 12px) clamp(10px, 1.6vw, 16px);
+  box-shadow: 
+    0 6px 0 #1b1e24,
+    0 12px 18px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  width: clamp(140px, 24vw, 230px);
+  pointer-events: auto;
+}
+
+.milestone-card-overlay:hover {
+  transform: translateY(-3px) scale(1.02);
+  border-color: #f39c12;
+  box-shadow: 
+    0 8px 0 #1b1e24,
+    0 16px 22px rgba(0, 0, 0, 0.35);
+}
+
+.milestone-card-overlay.active {
+  border-color: #27ae60;
+  background: #f1f9f2;
+}
+
+.card-step-badge {
+  display: inline-block;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(6.5px, 0.85vw, 8px);
+  padding: 3px 6px;
+  background: #23272e;
+  color: #f1c40f;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.card-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(7.5px, 1vw, 9.5px);
+  color: #1a1c22;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.card-subtitle {
+  font-family: 'Pixelify Sans', 'Fira Code', monospace;
+  font-size: clamp(9px, 1.2vw, 11.5px);
+  color: #4a5160;
+  line-height: 1.35;
+}
+
+.card-action-hint {
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(5.5px, 0.75vw, 7px);
+  color: #2980b9;
+}
+
+/* Collectible Coins */
+.secret-coin {
+  position: absolute;
+  width: clamp(20px, 3vw, 26px);
+  height: clamp(20px, 3vw, 26px);
+  cursor: pointer;
+  z-index: 30;
+  animation: coinSpin 1.8s infinite steps(6);
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.3));
+  transition: transform 0.15s;
+  pointer-events: auto;
+}
+
+.secret-coin:hover {
+  transform: scale(1.3);
+}
+
+.secret-coin.collected {
+  animation: coinCollect 0.6s forwards ease-out;
+  pointer-events: none;
+}
+
+@keyframes coinCollect {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  50% { transform: translateY(-30px) scale(1.5); opacity: 0.9; }
+  100% { transform: translateY(-50px) scale(0.2); opacity: 0; }
+}
+
+/* Floating XP text */
+.floating-xp-text {
+  position: fixed;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(9px, 1.5vw, 12px);
+  color: #f1c40f;
+  text-shadow: 2px 2px 0 #000;
+  pointer-events: none;
+  z-index: 9999;
+  animation: floatUpFade 0.9s forwards ease-out;
+}
+
+@keyframes floatUpFade {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-40px); opacity: 0; }
+}
+
+/* Mascot on bottom brick wall */
+.mascot-raccoon {
+  position: absolute;
+  bottom: 25px;
+  width: clamp(36px, 5vw, 48px);
+  height: clamp(20px, 3vw, 26px);
+  z-index: 35;
+  animation: mascotPace 14s infinite ease-in-out;
+}
+
+@keyframes mascotPace {
+  0% { transform: translateX(180px) scaleX(1); }
+  45% { transform: translateX(520px) scaleX(1); }
+  50% { transform: translateX(520px) scaleX(-1); }
+  95% { transform: translateX(180px) scaleX(-1); }
+  100% { transform: translateX(180px) scaleX(1); }
+}
+
+/* Mario-style Bottom Brick Wall */
+.bottom-brick-platform {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: clamp(48px, 6vh, 65px);
+  background-color: #b84418;
+  background-image: 
+    linear-gradient(335deg, #872e0d 23px, transparent 23px),
+    linear-gradient(155deg, #5b1d07 23px, transparent 23px),
+    linear-gradient(335deg, #872e0d 23px, transparent 23px),
+    linear-gradient(155deg, #5b1d07 23px, transparent 23px);
+  background-size: 58px 28px;
+  background-position: 0px 2px, 4px 17px, 29px 16px, 33px 31px;
+  border-top: 4px solid #1c0a03;
+  z-index: 25;
+}
+
+/* Golden Trophy at Summit */
+.trophy-container {
+  position: absolute;
+  cursor: pointer;
+  z-index: 38;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: auto;
+}
+
+.trophy-container:hover {
+  transform: scale(1.15) rotate(2deg);
+}
+
+.trophy-sparkle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  animation: sparkleTwinkle 1.6s infinite alternate ease-in-out;
+}
+
+@keyframes sparkleTwinkle {
+  0% { transform: scale(0.4) rotate(0deg); opacity: 0.3; }
+  100% { transform: scale(1.2) rotate(45deg); opacity: 1; }
+}
+
+/* ==========================================================================
+   DEVICE-SPECIFIC MEDIA QUERIES
+   ========================================================================== */
+
+/* Small Phone Screens (max-width: 480px) */
+@media (max-width: 480px) {
+  .hero-origin-shrine {
+    width: 110px;
+    padding: 5px;
+  }
+  
+  .shrine-photo-frame {
+    width: 80px;
+    height: 92px;
+  }
+
+  .start-button-overlay {
+    padding: 6px 12px;
+  }
+
+  .milestone-card-overlay {
+    width: 135px;
+    padding: 6px 8px;
+  }
+
+  .card-action-hint {
+    display: none; /* Keep card clean on small mobile */
+  }
+}
+
+/* Tablets & Mobile Landscape (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .milestone-card-overlay {
+    width: 160px;
+    padding: 8px 10px;
+  }
+}
+
+/* Ultra-wide Monitors (min-width: 1600px) */
+@media (min-width: 1600px) {
+  .roadmap-world {
+    width: 1100px;
+  }
+}
