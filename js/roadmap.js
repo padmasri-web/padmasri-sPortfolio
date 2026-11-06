@@ -1,5 +1,23 @@
 import { sound } from './audio.js';
 
+// ==========================================================================
+// SINGLE SOURCE OF TRUTH: Open Source Contributions & Stats
+// ==========================================================================
+export const openSource = {
+  jaeger: 11,
+  opentelemetry: 3,
+  get total() {
+    return this.jaeger + this.opentelemetry; // 14
+  },
+  status: "Actively contributing",
+  username: "padmasri-web",
+  jaegerUrl: "https://github.com/pulls?q=is%3Apr+author%3Apadmasri-web+is%3Amerged+org%3Ajaegertracing",
+  opentelemetryUrl: "https://github.com/pulls?q=is%3Apr+author%3Apadmasri-web+is%3Amerged+org%3Aopen-telemetry",
+  highlightedPRs: [
+    // Optional array: { title: "PR title", repo: "jaegertracing/jaeger", url: "https://github.com/..." }
+  ]
+};
+
 export class RoadmapGame {
   constructor() {
     this.currentProgress = 0; // 0.0 to 1.0
@@ -47,7 +65,7 @@ export class RoadmapGame {
       },
       {
         id: 1,
-        progress: 0.20,
+        progress: 0.18,
         name: "01 • ACADEMY",
         title: "Knowledge Glade: Mirai School of Tech",
         tag: "STATION 1",
@@ -56,7 +74,7 @@ export class RoadmapGame {
       },
       {
         id: 2,
-        progress: 0.42,
+        progress: 0.35,
         name: "02 • TECH ARSENAL",
         title: "The Arsenal: Full-Stack & AI Stack",
         tag: "STATION 2",
@@ -65,28 +83,46 @@ export class RoadmapGame {
       },
       {
         id: 3,
-        progress: 0.65,
-        name: "03 • QUEST VALLEY",
-        title: "Quest Valley: 5 Featured Projects",
+        progress: 0.50,
+        name: "03 • OPEN SOURCE",
+        title: "OPEN SOURCE PROFILE",
         tag: "STATION 3",
+        type: "opensource",
+        cardId: "card-opensource"
+      },
+      {
+        id: 4,
+        progress: 0.64,
+        name: "04 • QUEST VALLEY",
+        title: "Quest Valley: 5 Featured Projects",
+        tag: "STATION 4",
         type: "projects",
         cardId: "card-projects"
       },
       {
-        id: 4,
-        progress: 0.83,
-        name: "04 • BATTLE ARENA",
-        title: "Battle Arena: 250+ LeetCode & CNCF PRs",
-        tag: "STATION 4",
+        id: 5,
+        progress: 0.77,
+        name: "05 • SERVICES",
+        title: "Workshop: What I Can Build For You",
+        tag: "STATION 5",
+        type: "services",
+        cardId: "card-services"
+      },
+      {
+        id: 6,
+        progress: 0.89,
+        name: "06 • BOSS LOGS",
+        title: "Battle Arena: 250+ LeetCode & Achievements",
+        tag: "STATION 6",
         type: "achievements",
         cardId: "card-achievements"
       },
       {
-        id: 5,
+        id: 7,
         progress: 1.0,
-        name: "05 • GOLDEN SUMMIT",
+        name: "07 • GOLDEN SUMMIT",
         title: "Golden Summit: Contact & Hire Padmasri",
-        tag: "STATION 5",
+        tag: "STATION 7",
         type: "contact",
         cardId: "card-contact"
       }
@@ -223,7 +259,7 @@ export class RoadmapGame {
   updateNextStop(progress) {
     // Find next upcoming milestone
     let nextIdx = this.milestones.findIndex(m => m.progress > progress + 0.02);
-    if (nextIdx === -1) nextIdx = 5;
+    if (nextIdx === -1) nextIdx = this.milestones.length - 1;
 
     let currentIdx = nextIdx > 0 ? nextIdx - 1 : 0;
     this.currentMilestone = currentIdx;
@@ -363,6 +399,11 @@ export class RoadmapGame {
         return;
       }
 
+      const hirePopover = document.getElementById('hire-me-popover');
+      if (hirePopover && hirePopover.classList.contains('open')) {
+        return;
+      }
+
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'KeyS' || e.key === 'KeyD') {
         const nextIdx = Math.min(this.milestones.length - 1, this.currentMilestone + 1);
         this.scrollToMilestone(nextIdx, false);
@@ -414,7 +455,7 @@ export class RoadmapGame {
     const trophy = document.getElementById('summit-trophy');
     if (trophy) {
       trophy.addEventListener('click', () => {
-        this.scrollToMilestone(5, true);
+        this.scrollToMilestone(7, true);
       });
     }
   }
@@ -481,7 +522,7 @@ export class RoadmapGame {
               </div>
               <div class="stat-item">
                 <div class="stat-label">CNCF MERGED PRS</div>
-                <div class="stat-val">10 (Jaeger & OTel)</div>
+                <div class="stat-val">${openSource.total} (Jaeger & OTel)</div>
               </div>
             </div>
           </div>
@@ -497,6 +538,7 @@ export class RoadmapGame {
           <a href="https://www.linkedin.com/in/padmasri-chikle/" target="_blank" rel="noopener noreferrer" class="rpg-btn">💼 LinkedIn Profile</a>
           <a href="https://github.com/padmasri-web" target="_blank" rel="noopener noreferrer" class="rpg-btn">🐙 GitHub Repos</a>
           <a href="https://leetcode.com/u/padmasrii_codes/" target="_blank" rel="noopener noreferrer" class="rpg-btn">⚡ LeetCode</a>
+          <a href="https://codeforces.com/profile/padmasri2310" target="_blank" rel="noopener noreferrer" class="rpg-btn">⚡ Codeforces</a>
           <button class="rpg-btn" onclick="window.roadmapInstance.scrollToMilestone(1, true); window.roadmapInstance.closeModal();">Begin Adventure ▶</button>
         </div>
       </div>
@@ -540,7 +582,7 @@ export class RoadmapGame {
           <div style="background: #232936; border: 2px solid #363e52; border-radius: 10px; padding: 16px; margin-bottom: 18px; line-height: 1.7; font-size: 13px; color: #cbd5e1;">
             Passionate software developer and Artificial Intelligence / Machine Learning engineering student with a track record of building performant full-stack web platforms, real-time distributed applications, and open-source contributions.
             <br><br>
-            Active contributor to CNCF (Cloud Native Computing Foundation) projects including <strong>Jaeger</strong> and <strong>OpenTelemetry</strong>, and an avid competitive programmer with <strong>250+ solved algorithmic problems</strong> on LeetCode.
+            Active contributor to CNCF (Cloud Native Computing Foundation) projects including <strong>Jaeger</strong> (${openSource.jaeger} PRs) and <strong>OpenTelemetry</strong> (${openSource.opentelemetry} PRs) with <strong>${openSource.total} merged PRs</strong>, and an avid competitive programmer with <strong>250+ solved algorithmic problems</strong> on LeetCode.
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 10px;">
             <a href="https://drive.google.com/file/d/1cT9AdrHuSwM93CPUsjus9PfUzDXhagcT/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="rpg-btn gold">📄 View Resume ↗</a>
@@ -590,79 +632,192 @@ export class RoadmapGame {
 
       case 2:
         return `
-          <div class="inventory-section">
-            <div class="inventory-section-title"><span>🗡️</span> CORE LANGUAGES</div>
-            <div class="inventory-grid">
-              <div class="inventory-slot">
-                <div class="slot-name-row"><span>C++</span><span>Proficient (90%)</span></div>
-                <div class="slot-progress-bg"><div class="slot-progress-fill" style="width: 90%;"></div></div>
-              </div>
-              <div class="inventory-slot">
-                <div class="slot-name-row"><span>JavaScript (ES6+)</span><span>Advanced (95%)</span></div>
-                <div class="slot-progress-bg"><div class="slot-progress-fill" style="width: 95%;"></div></div>
-              </div>
-              <div class="inventory-slot">
-                <div class="slot-name-row"><span>TypeScript</span><span>Advanced (85%)</span></div>
-                <div class="slot-progress-bg"><div class="slot-progress-fill" style="width: 85%;"></div></div>
-              </div>
-              <div class="inventory-slot">
-                <div class="slot-name-row"><span>HTML5 & CSS3</span><span>Expert (95%)</span></div>
-                <div class="slot-progress-bg"><div class="slot-progress-fill" style="width: 95%;"></div></div>
-              </div>
+          <!-- Recruiter Summary Callout -->
+          <div class="skills-summary-callout">
+            <div class="skills-summary-title">Full-Stack MERN & AI Developer</div>
+            <p class="skills-summary-text">
+              Building end-to-end production web applications with React and Node.js, real-time bi-directional systems with Socket.IO, and AI features powered by the Google Gemini API. Active CNCF open source contributor (Jaeger & OpenTelemetry).
+            </p>
+          </div>
+
+          <!-- Category 1: Frontend Architecture -->
+          <div class="skill-category-card">
+            <div class="skill-category-header">
+              <span class="skill-category-name">01 • FRONTEND ARCHITECTURE</span>
+              <span class="skill-category-role">Client-Side & SPAs</span>
+            </div>
+            <div class="skill-tags-flex">
+              <span class="skill-tag primary-tag">React.js / React 18</span>
+              <span class="skill-tag">TypeScript</span>
+              <span class="skill-tag">JavaScript (ES6+)</span>
+              <span class="skill-tag">HTML5 & CSS3</span>
+              <span class="skill-tag">GSAP Animations</span>
+              <span class="skill-tag">Three.js (3D Canvas)</span>
+              <span class="skill-tag">Bootstrap</span>
+              <span class="skill-tag">EJS Templating</span>
             </div>
           </div>
 
-          <div class="inventory-section">
-            <div class="inventory-section-title"><span>🛡️</span> FRONTEND & UI MAGIC</div>
-            <div class="inventory-grid">
-              <div class="inventory-slot">
-                <div class="slot-name-row"><span>React 18</span><span>Component Arch</span></div>
-                <div class="slot-progress-bg"><div class="slot-progress-fill" style="width: 90%;"></div></div>
-              </div>
-              <div class="inventory-slot">
-                <div class="slot-name-row"><span>Three.js</span><span>3D Visuals</span></div>
-                <div class="slot-progress-bg"><div class="slot-progress-fill" style="width: 75%;"></div></div>
-              </div>
-              <div class="inventory-slot">
-                <div class="slot-name-row"><span>GSAP & Canvas</span><span>Animations</span></div>
-                <div class="slot-progress-bg"><div class="slot-progress-fill" style="width: 82%;"></div></div>
-              </div>
-              <div class="inventory-slot">
-                <div class="slot-name-row"><span>Tailwind / EJS</span><span>Templates</span></div>
-                <div class="slot-progress-bg"><div class="slot-progress-fill" style="width: 88%;"></div></div>
-              </div>
+          <!-- Category 2: Backend, APIs & Real-time -->
+          <div class="skill-category-card">
+            <div class="skill-category-header">
+              <span class="skill-category-name">02 • BACKEND & MICROSERVICES</span>
+              <span class="skill-category-role">Server & APIs</span>
+            </div>
+            <div class="skill-tags-flex">
+              <span class="skill-tag primary-tag">Node.js</span>
+              <span class="skill-tag primary-tag">Express.js</span>
+              <span class="skill-tag accent-tag">RESTful APIs</span>
+              <span class="skill-tag accent-tag">Socket.IO (WebSockets)</span>
+              <span class="skill-tag">Passport.js (Auth)</span>
+              <span class="skill-tag">Mongoose ODM</span>
+              <span class="skill-tag">Multer</span>
             </div>
           </div>
 
-          <div class="inventory-section">
-            <div class="inventory-section-title"><span>⚡</span> BACKEND, AI & CLOUD ENGINES</div>
-            <div class="inventory-grid">
-              <div class="inventory-slot">
-                <div class="slot-name-row"><span>Node.js / Express</span><span>Microservices</span></div>
-                <div class="slot-progress-bg"><div class="slot-progress-fill" style="width: 92%;"></div></div>
-              </div>
-              <div class="inventory-slot">
-                <div class="slot-name-row"><span>Google Gemini AI</span><span>LLM Interactions</span></div>
-                <div class="slot-progress-bg"><div class="slot-progress-fill" style="width: 88%;"></div></div>
-              </div>
-              <div class="inventory-slot">
-                <div class="slot-name-row"><span>Socket.IO</span><span>WebSockets</span></div>
-                <div class="slot-progress-bg"><div class="slot-progress-fill" style="width: 86%;"></div></div>
-              </div>
-              <div class="inventory-slot">
-                <div class="slot-name-row"><span>MongoDB / Cloudinary</span><span>Data & Media</span></div>
-                <div class="slot-progress-bg"><div class="slot-progress-fill" style="width: 90%;"></div></div>
-              </div>
+          <!-- Category 3: Databases & Media Cloud -->
+          <div class="skill-category-card">
+            <div class="skill-category-header">
+              <span class="skill-category-name">03 • DATABASES & CLOUD</span>
+              <span class="skill-category-role">Persistence & Media</span>
+            </div>
+            <div class="skill-tags-flex">
+              <span class="skill-tag primary-tag">MongoDB</span>
+              <span class="skill-tag">Cloudinary (Media CDN)</span>
+              <span class="skill-tag">Data Modeling</span>
+              <span class="skill-tag">Aggregation Pipelines</span>
+            </div>
+          </div>
+
+          <!-- Category 4: AI & Machine Learning -->
+          <div class="skill-category-card">
+            <div class="skill-category-header">
+              <span class="skill-category-name">04 • AI & GENERATIVE MODELS</span>
+              <span class="skill-category-role">Integrations</span>
+            </div>
+            <div class="skill-tags-flex">
+              <span class="skill-tag accent-tag">Google Gemini Flash API</span>
+              <span class="skill-tag">LLM Prompt Engineering</span>
+              <span class="skill-tag">AI Plot & Synopsis Generation</span>
+              <span class="skill-tag">GenAI Workflows</span>
+            </div>
+          </div>
+
+          <!-- Category 5: Core Problem Solving & Tools -->
+          <div class="skill-category-card">
+            <div class="skill-category-header">
+              <span class="skill-category-name">05 • LANGUAGES & TOOLS</span>
+              <span class="skill-category-role">Problem Solving & DevOps</span>
+            </div>
+            <div class="skill-tags-flex">
+              <span class="skill-tag primary-tag">C++ (Data Structures & Algo)</span>
+              <span class="skill-tag">Git & GitHub</span>
+              <span class="skill-tag">Postman</span>
+              <span class="skill-tag">Render & Vercel</span>
+              <span class="skill-tag">VS Code</span>
+              <span class="skill-tag">GitHub Pages</span>
+              <span class="skill-tag">Figma & Framer</span>
             </div>
           </div>
 
           <div style="display: flex; justify-content: space-between; margin-top: 16px;">
-            <button class="rpg-btn" onclick="window.roadmapInstance.scrollToMilestone(1, true); window.roadmapInstance.closeModal();">◀ Back</button>
-            <button class="rpg-btn primary" onclick="window.roadmapInstance.scrollToMilestone(3, true); window.roadmapInstance.closeModal();">Next: Projects ▶</button>
+            <button class="rpg-btn" onclick="window.roadmapInstance.scrollToMilestone(1, true); window.roadmapInstance.closeModal();">◀ Back: Academy</button>
+            <button class="rpg-btn primary" onclick="window.roadmapInstance.scrollToMilestone(3, true); window.roadmapInstance.closeModal();">Next: Open Source ▶</button>
           </div>
         `;
 
       case 3:
+        return `
+          <div class="opensource-modal-container">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <h2 class="services-modal-heading" style="color: #38bdf8; margin-bottom: 6px;">Open Source Contributor, CNCF</h2>
+                <p class="services-modal-subline" style="margin-bottom: 0; padding-bottom: 0; border-bottom: none;">
+                  Actively contributing to production observability tools used by engineering teams worldwide.
+                </p>
+              </div>
+              <span class="project-badge" style="color: #2ecc71; border-color: #27ae60; background: rgba(46, 204, 113, 0.15); font-size: 11px; padding: 5px 10px; display: inline-flex; align-items: center; gap: 6px;">
+                <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #2ecc71; box-shadow: 0 0 6px #2ecc71;"></span>
+                ${openSource.status}
+              </span>
+            </div>
+
+            <!-- Total CNCF Merged PRs Banner -->
+            <div class="opensource-total-banner">
+              <div class="opensource-total-num">${openSource.total}</div>
+              <div class="opensource-total-label">CNCF MERGED PULL REQUESTS ACROSS PRODUCTION REPOSITORIES</div>
+            </div>
+
+            <!-- 2 Stat Cards -->
+            <div class="opensource-orgs-grid">
+              <!-- Jaeger -->
+              <div class="opensource-org-card">
+                <div class="opensource-org-header">
+                  <div class="opensource-org-logo">⚡</div>
+                  <div class="opensource-org-info">
+                    <h3 class="opensource-org-name">Jaeger Tracing</h3>
+                    <span class="opensource-org-tag">Distributed Tracing (CNCF Graduated)</span>
+                  </div>
+                </div>
+                <div class="opensource-stat-box">
+                  <span class="opensource-stat-count">${openSource.jaeger}</span>
+                  <span class="opensource-stat-desc">Merged Pull Requests</span>
+                </div>
+                <p class="opensource-org-desc">
+                  Cloud-native distributed tracing backend monitoring complex microservice transactions.
+                </p>
+                <a href="${openSource.jaegerUrl}" target="_blank" rel="noopener noreferrer" class="rpg-btn primary" style="width: 100%; margin-top: 10px;">
+                  Jaeger PRs on GitHub ↗
+                </a>
+              </div>
+
+              <!-- OpenTelemetry -->
+              <div class="opensource-org-card">
+                <div class="opensource-org-header">
+                  <div class="opensource-org-logo">🔭</div>
+                  <div class="opensource-org-info">
+                    <h3 class="opensource-org-name">OpenTelemetry</h3>
+                    <span class="opensource-org-tag">Telemetry Standards (CNCF Incubating)</span>
+                  </div>
+                </div>
+                <div class="opensource-stat-box">
+                  <span class="opensource-stat-count">${openSource.opentelemetry}</span>
+                  <span class="opensource-stat-desc">Merged Pull Requests</span>
+                </div>
+                <p class="opensource-org-desc">
+                  Industry standard framework, collection agents, and APIs for traces, metrics, and logs.
+                </p>
+                <a href="${openSource.opentelemetryUrl}" target="_blank" rel="noopener noreferrer" class="rpg-btn primary" style="width: 100%; margin-top: 10px;">
+                  OpenTelemetry PRs on GitHub ↗
+                </a>
+              </div>
+            </div>
+
+            <!-- Optional Highlighted PRs List -->
+            ${openSource.highlightedPRs && openSource.highlightedPRs.length > 0 ? `
+              <div class="highlighted-prs-section" style="margin-top: 18px;">
+                <h4 style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #f1c40f; margin-bottom: 10px;">FEATURED CONTRIBUTIONS</h4>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  ${openSource.highlightedPRs.map(pr => `
+                    <a href="${pr.url}" target="_blank" rel="noopener noreferrer" class="highlighted-pr-item">
+                      <span style="font-family: 'Press Start 2P', monospace; font-size: 8.5px; color: #38bdf8;">${pr.repo}</span>
+                      <span style="font-size: 12px; color: #ffffff;">${pr.title}</span>
+                      <span style="font-size: 10px; color: #f1c40f;">➔</span>
+                    </a>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Milestone Navigation -->
+            <div style="display: flex; justify-content: space-between; margin-top: 18px; padding-top: 14px; border-top: 1px solid #2e3544;">
+              <button class="rpg-btn" onclick="window.roadmapInstance.scrollToMilestone(2, true); window.roadmapInstance.closeModal();">◀ Back: Arsenal</button>
+              <button class="rpg-btn primary" onclick="window.roadmapInstance.scrollToMilestone(4, true); window.roadmapInstance.closeModal();">Next: Quests ▶</button>
+            </div>
+          </div>
+        `;
+
+      case 4:
         return `
           <div class="quest-projects-grid">
             <!-- ShopBazar -->
@@ -791,12 +946,116 @@ export class RoadmapGame {
           </div>
 
           <div style="display: flex; justify-content: space-between; margin-top: 16px;">
-            <button class="rpg-btn" onclick="window.roadmapInstance.scrollToMilestone(2, true); window.roadmapInstance.closeModal();">◀ Back</button>
-            <button class="rpg-btn primary" onclick="window.roadmapInstance.scrollToMilestone(4, true); window.roadmapInstance.closeModal();">Next: Achievements ▶</button>
+            <button class="rpg-btn" onclick="window.roadmapInstance.scrollToMilestone(3, true); window.roadmapInstance.closeModal();">◀ Back: Open Source</button>
+            <button class="rpg-btn primary" onclick="window.roadmapInstance.scrollToMilestone(5, true); window.roadmapInstance.closeModal();">Next: Services ▶</button>
           </div>
         `;
 
-      case 4:
+      case 5:
+        return `
+          <div class="services-modal-container">
+            <h2 class="services-modal-heading">What I can build for you</h2>
+            <p class="services-modal-subline">I’m a full-stack developer who ships working products. Pick what fits, or tell me what you need.</p>
+
+            <div class="services-cards-grid">
+              <!-- Service 1 -->
+              <div class="service-offer-card">
+                <div class="service-card-header">
+                  <span class="service-card-number">01</span>
+                  <h3 class="service-offer-title">Full-stack web app (MERN)</h3>
+                </div>
+                <p class="service-offer-desc">
+                  A complete web app, from database to polished UI: login, dashboards, payments, admin panels, and deployment.
+                </p>
+                <div class="service-detail-block">
+                  <div class="service-meta-row">
+                    <span class="service-meta-label">Built with:</span>
+                    <span class="service-meta-text">React, Node/Express, MongoDB, Passport.js</span>
+                  </div>
+                  <div class="service-meta-row">
+                    <span class="service-meta-label">Good for:</span>
+                    <span class="service-meta-text">small businesses, startups, college clubs, MVPs</span>
+                  </div>
+                  <div class="service-meta-row">
+                    <span class="service-meta-label">Proof:</span>
+                    <span class="service-proof-links">
+                      <a href="https://shopbazar-hufs.onrender.com/" target="_blank" rel="noopener noreferrer" class="service-proof-link">ShopBazar ↗</a>, 
+                      <a href="https://padmasri-web.github.io/Amazon-Clone/" target="_blank" rel="noopener noreferrer" class="service-proof-link">Amazon Clone ↗</a>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Service 2 -->
+              <div class="service-offer-card">
+                <div class="service-card-header">
+                  <span class="service-card-number">02</span>
+                  <h3 class="service-offer-title">AI features for your existing site</h3>
+                </div>
+                <p class="service-offer-desc">
+                  I add an AI feature to a site you already have: a chatbot trained on your content, smart recommendations, search, or summaries.
+                </p>
+                <div class="service-detail-block">
+                  <div class="service-meta-row">
+                    <span class="service-meta-label">Built with:</span>
+                    <span class="service-meta-text">Gemini API, Node.js, React</span>
+                  </div>
+                  <div class="service-meta-row">
+                    <span class="service-meta-label">Good for:</span>
+                    <span class="service-meta-text">stores, content sites, support pages</span>
+                  </div>
+                  <div class="service-meta-row">
+                    <span class="service-meta-label">Proof:</span>
+                    <span class="service-proof-links">
+                      <a href="https://github.com/padmasri-web" target="_blank" rel="noopener noreferrer" class="service-proof-link">MovieAdda ↗</a>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Service 3 -->
+              <div class="service-offer-card">
+                <div class="service-card-header">
+                  <span class="service-card-number">03</span>
+                  <h3 class="service-offer-title">Real-time features</h3>
+                </div>
+                <p class="service-offer-desc">
+                  Live chat, notifications, live status updates, and collaborative or multi-user features that update instantly without a page refresh.
+                </p>
+                <div class="service-detail-block">
+                  <div class="service-meta-row">
+                    <span class="service-meta-label">Built with:</span>
+                    <span class="service-meta-text">Socket.IO, Node.js, React</span>
+                  </div>
+                  <div class="service-meta-row">
+                    <span class="service-meta-label">Good for:</span>
+                    <span class="service-meta-text">marketplaces, community apps, booking and tracking tools</span>
+                  </div>
+                  <div class="service-meta-row">
+                    <span class="service-meta-label">Proof:</span>
+                    <span class="service-proof-links">
+                      <a href="https://campusfind-8hn9.onrender.com/" target="_blank" rel="noopener noreferrer" class="service-proof-link">CampusFind ↗</a>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CTA Container -->
+            <div class="services-cta-container">
+              <a href="mailto:padmasrichikle@gmail.com?subject=Project%20Inquiry%20-%20Start%20a%20Project" class="rpg-btn primary services-cta-btn">Start a project →</a>
+              <p class="services-cta-subtext">Not sure which fits? Send me a short note about your idea and I’ll reply with a plan.</p>
+            </div>
+
+            <!-- Milestone Navigation -->
+            <div style="display: flex; justify-content: space-between; margin-top: 18px; padding-top: 14px; border-top: 1px solid #2e3544;">
+              <button class="rpg-btn" onclick="window.roadmapInstance.scrollToMilestone(4, true); window.roadmapInstance.closeModal();">◀ Back: Quests</button>
+              <button class="rpg-btn primary" onclick="window.roadmapInstance.scrollToMilestone(6, true); window.roadmapInstance.closeModal();">Next: Achievements ▶</button>
+            </div>
+          </div>
+        `;
+
+      case 6:
         return `
           <div class="battle-cards-grid">
             <div class="battle-trophy-card">
@@ -812,28 +1071,28 @@ export class RoadmapGame {
               <div class="battle-score">777</div>
               <div class="battle-title">Codeforces Rating</div>
               <p class="battle-desc">130+ Competitive programming problems solved across speed challenges.</p>
-              <a href="https://codeforces.com" target="_blank" rel="noopener noreferrer" class="rpg-btn primary" style="margin-top: 10px; width: 100%;">Profile ↗</a>
+              <a href="https://codeforces.com/profile/padmasri2310" target="_blank" rel="noopener noreferrer" class="rpg-btn primary" style="margin-top: 10px; width: 100%;">Codeforces Profile ↗</a>
             </div>
 
             <div class="battle-trophy-card">
               <div class="battle-icon">🌐</div>
-              <div class="battle-score">10 Merged PRs</div>
+              <div class="battle-score">${openSource.total} Merged PRs</div>
               <div class="battle-title">CNCF Open Source</div>
               <p class="battle-desc">
-                <strong>7 Merged PRs</strong> in <em>Jaeger Tracing</em><br>
-                <strong>3 Merged PRs</strong> in <em>OpenTelemetry</em>
+                <strong>${openSource.jaeger} Merged PRs</strong> in <em>Jaeger Tracing</em><br>
+                <strong>${openSource.opentelemetry} Merged PRs</strong> in <em>OpenTelemetry</em>
               </p>
-              <a href="https://github.com/padmasri-web" target="_blank" rel="noopener noreferrer" class="rpg-btn primary" style="margin-top: 10px; width: 100%;">GitHub Activity ↗</a>
+              <a href="https://github.com/${openSource.username}" target="_blank" rel="noopener noreferrer" class="rpg-btn primary" style="margin-top: 10px; width: 100%;">GitHub Activity ↗</a>
             </div>
           </div>
 
           <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-            <button class="rpg-btn" onclick="window.roadmapInstance.scrollToMilestone(3, true); window.roadmapInstance.closeModal();">◀ Back</button>
-            <button class="rpg-btn gold" onclick="window.roadmapInstance.scrollToMilestone(5, true); window.roadmapInstance.closeModal();">Reach The Summit 🏆</button>
+            <button class="rpg-btn" onclick="window.roadmapInstance.scrollToMilestone(5, true); window.roadmapInstance.closeModal();">◀ Back: Services</button>
+            <button class="rpg-btn gold" onclick="window.roadmapInstance.scrollToMilestone(7, true); window.roadmapInstance.closeModal();">Reach The Summit 🏆</button>
           </div>
         `;
 
-      case 5:
+      case 7:
         return `
           <div style="text-align: center; margin-bottom: 20px;">
             <div style="position: relative; width: 110px; height: 125px; margin: 0 auto 12px auto; border-radius: 12px; border: 4px solid #f1c40f; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.6); background: #252b38;">

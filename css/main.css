@@ -269,6 +269,250 @@ html, body {
   flex-shrink: 0;
 }
 
+/* ==========================================================================
+   PERSISTENT "HIRE ME" BUTTON & POPOVER
+   Most prominent call to action on screen, orange RPG aesthetic
+   ========================================================================== */
+.hire-me-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.hire-me-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(180deg, #ff7a18 0%, #e65100 100%);
+  color: #ffffff;
+  border: 2px solid #ffd180;
+  padding: 5px clamp(9px, 1.2vw, 13px);
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #872e0d, 0 0 12px rgba(255, 122, 24, 0.45);
+  transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
+  text-decoration: none;
+  white-space: nowrap;
+  outline: none;
+}
+
+.hire-me-btn:hover {
+  background: linear-gradient(180deg, #ff8c33 0%, #f05a00 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 #872e0d, 0 0 18px rgba(255, 122, 24, 0.75);
+}
+
+.hire-me-btn:active,
+.hire-me-btn.active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #872e0d, 0 0 8px rgba(255, 122, 24, 0.3);
+}
+
+.hire-me-btn:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.hire-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2ecc71;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 0 6px #2ecc71;
+  flex-shrink: 0;
+  animation: hireDotPulse 1.8s infinite alternate ease-in-out;
+}
+
+@keyframes hireDotPulse {
+  0% { transform: scale(0.85); box-shadow: 0 0 4px #2ecc71; }
+  100% { transform: scale(1.2); box-shadow: 0 0 10px #2ecc71; }
+}
+
+.hire-btn-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.hire-btn-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(7.5px, 0.95vw, 9px);
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.3px;
+}
+
+.hire-btn-subtitle {
+  font-family: 'Pixelify Sans', 'Fira Code', monospace;
+  font-size: 7.5px;
+  font-weight: 600;
+  color: #ffe0b2;
+  line-height: 1;
+  margin-top: 2px;
+  letter-spacing: 0.2px;
+}
+
+.hire-arrow-indicator {
+  font-size: 8px;
+  color: #ffe0b2;
+  transition: transform 0.15s ease;
+  margin-left: 2px;
+}
+
+.hire-me-btn.active .hire-arrow-indicator {
+  transform: rotate(180deg);
+}
+
+/* Popover Menu */
+.hire-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 250px;
+  background: #181d28;
+  border: 2px solid #ff7a18;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 
+    0 8px 0 #0c0e14,
+    0 16px 30px rgba(0, 0, 0, 0.7);
+  z-index: 200;
+  display: none;
+  animation: popoverFadeIn 0.15s ease-out;
+}
+
+.hire-popover.open {
+  display: block;
+}
+
+@keyframes popoverFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hire-popover-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #2e3544;
+}
+
+.hire-popover-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  color: #ff7a18;
+  letter-spacing: 0.5px;
+}
+
+.hire-popover-close-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  border-radius: 4px;
+  transition: color 0.1s;
+}
+
+.hire-popover-close-btn:hover {
+  color: #ffffff;
+}
+
+.hire-popover-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hire-option-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  background: #232936;
+  border: 1.5px solid #363e52;
+  transition: background 0.12s, border-color 0.12s, transform 0.1s;
+}
+
+.hire-option-item:hover,
+.hire-option-item:focus-visible {
+  transform: translateX(2px);
+  outline: none;
+}
+
+/* Primary Option (Email) */
+.hire-option-item.primary {
+  background: linear-gradient(90deg, #ff7a18 0%, #e65100 100%);
+  border-color: #ffd180;
+  box-shadow: 0 2px 8px rgba(255, 122, 24, 0.35);
+}
+
+.hire-option-item.primary:hover,
+.hire-option-item.primary:focus-visible {
+  background: linear-gradient(90deg, #ff8c33 0%, #f05a00 100%);
+  border-color: #ffffff;
+  outline: 2px solid #ffffff;
+  outline-offset: 1px;
+}
+
+.hire-option-item.primary .hire-option-label {
+  color: #ffffff;
+}
+
+.hire-option-item.primary .hire-option-sub {
+  color: #ffe0b2;
+}
+
+.hire-option-item.primary .hire-option-arrow {
+  color: #ffffff;
+}
+
+/* Secondary Options (LinkedIn & GitHub) */
+.hire-option-item:not(.primary):hover,
+.hire-option-item:not(.primary):focus-visible {
+  background: #2a3242;
+  border-color: #38bdf8;
+  outline: 2px solid #38bdf8;
+  outline-offset: 1px;
+}
+
+.hire-option-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.hire-option-text {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.hire-option-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #ffffff;
+  margin-bottom: 2px;
+}
+
+.hire-option-sub {
+  font-size: 9.5px;
+  color: #94a3b8;
+}
+
+.hire-option-arrow {
+  font-size: 10px;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
 /* Permanent Glowing Resume Button (Always Visible) */
 .hud-resume-btn {
   display: flex;
@@ -838,6 +1082,89 @@ html, body {
 }
 
 /* Skills Inventory in Modal */
+.skills-summary-callout {
+  background: #232936;
+  border-left: 4px solid var(--accent-orange);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+
+.skills-summary-title {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.skills-summary-text {
+  color: #94a3b8;
+  font-size: 11.5px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.skill-category-card {
+  background: #1c222e;
+  border: 1px solid #333d4f;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.skill-category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.skill-category-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  color: var(--accent-gold);
+  letter-spacing: 0.5px;
+}
+
+.skill-category-role {
+  font-size: 11px;
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+.skill-tags-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.skill-tag {
+  background: #252d3d;
+  color: #e2e8f0;
+  border: 1px solid #3b465c;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.skill-tag.primary-tag {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+}
+
+.skill-tag.accent-tag {
+  background: rgba(243, 156, 18, 0.12);
+  border-color: rgba(243, 156, 18, 0.35);
+  color: #f39c12;
+}
+
 .inventory-section {
   margin-bottom: 18px;
 }
@@ -927,6 +1254,314 @@ html, body {
 }
 
 /* ==========================================================================
+   OPEN SOURCE STOP STYLES (Station 3)
+   ========================================================================== */
+.opensource-modal-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.opensource-total-banner {
+  background: linear-gradient(135deg, #162235 0%, #101826 100%);
+  border: 2px solid #38bdf8;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+.opensource-total-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(22px, 3vw, 28px);
+  color: #38bdf8;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.opensource-total-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(7.5px, 0.9vw, 9px);
+  color: #f1f5f9;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+}
+
+.opensource-orgs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 14px;
+}
+
+.opensource-org-card {
+  background: #232936;
+  border: 2px solid #363e52;
+  border-radius: 10px;
+  padding: clamp(14px, 2vw, 18px);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.opensource-org-card:hover {
+  border-color: #38bdf8;
+  transform: translateY(-2px);
+}
+
+.opensource-org-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.opensource-org-logo {
+  font-size: 22px;
+  background: #171a22;
+  border: 1px solid #323a4c;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.opensource-org-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.opensource-org-name {
+  font-family: 'Pixelify Sans', 'Fira Code', monospace;
+  font-size: clamp(14.5px, 1.8vw, 16.5px);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 2px;
+}
+
+.opensource-org-tag {
+  font-size: 10.5px;
+  color: #94a3b8;
+}
+
+.opensource-stat-box {
+  background: #171a22;
+  border: 1px solid #2e3544;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.opensource-stat-count {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(13px, 1.7vw, 15px);
+  color: #f1c40f;
+}
+
+.opensource-stat-desc {
+  font-size: 11.5px;
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+.opensource-org-desc {
+  font-size: clamp(11.5px, 1.4vw, 12.5px);
+  line-height: 1.55;
+  color: #cbd5e1;
+  flex-grow: 1;
+  margin-bottom: 12px;
+}
+
+.highlighted-pr-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #171a22;
+  border: 1px solid #363e52;
+  border-radius: 8px;
+  padding: 10px 14px;
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+}
+
+.highlighted-pr-item:hover,
+.highlighted-pr-item:focus-visible {
+  border-color: #f1c40f;
+  outline: none;
+}
+
+/* ==========================================================================
+   SERVICES & WHAT I CAN BUILD FOR YOU (Station 4)
+   Clean, Professional, Plain English, Recruiter/Client Friendly
+   ========================================================================== */
+.services-modal-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.services-modal-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(12px, 1.8vw, 15px);
+  color: var(--accent-gold);
+  margin-bottom: 8px;
+  line-height: 1.4;
+  letter-spacing: 0.3px;
+}
+
+.services-modal-subline {
+  font-size: clamp(12px, 1.4vw, 13.5px);
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #2e3544;
+}
+
+.services-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.service-offer-card {
+  background: #232936;
+  border: 2px solid #363e52;
+  border-radius: 10px;
+  padding: clamp(14px, 2vw, 18px);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.service-offer-card:hover {
+  border-color: var(--accent-gold);
+  transform: translateY(-2px);
+}
+
+.service-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.service-card-number {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--accent-blue);
+  background: #171a22;
+  border: 1px solid #323a4c;
+  padding: 3px 6px;
+  border-radius: 4px;
+}
+
+.service-offer-title {
+  font-family: 'Pixelify Sans', 'Fira Code', monospace;
+  font-size: clamp(13.5px, 1.6vw, 16px);
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+}
+
+.service-offer-desc {
+  font-size: clamp(12px, 1.4vw, 13px);
+  line-height: 1.55;
+  color: #cbd5e1;
+  margin-bottom: 12px;
+}
+
+.service-detail-block {
+  background: #171a22;
+  border: 1px solid #2e3544;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.service-meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: clamp(11.5px, 1.3vw, 12.5px);
+  line-height: 1.5;
+}
+
+.service-meta-label {
+  font-weight: 700;
+  color: #94a3b8;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.service-meta-text {
+  color: #e2e8f0;
+}
+
+.service-proof-links {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.service-proof-link {
+  color: var(--accent-blue);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.service-proof-link:hover,
+.service-proof-link:focus-visible {
+  color: var(--accent-gold);
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.services-cta-container {
+  background: #1c212b;
+  border: 2px solid #3d4659;
+  border-radius: 10px;
+  padding: 16px 14px;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.services-cta-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 11px;
+  text-decoration: none;
+}
+
+.services-cta-btn:focus-visible {
+  outline: 3px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+.services-cta-subtext {
+  margin-top: 10px;
+  font-size: clamp(11px, 1.3vw, 12px);
+  color: #94a3b8;
+  line-height: 1.45;
+}
+
+/* ==========================================================================
    BREAKPOINTS & RESPONSIVE RULES
    ========================================================================== */
 
@@ -938,6 +1573,45 @@ html, body {
 
   .control-hint {
     display: none;
+  }
+}
+
+/* Mobile Devices (<= 640px): Floating Hire Me Pill pinned to bottom right */
+@media (max-width: 640px) {
+  #hire-button-mount {
+    position: fixed;
+    bottom: calc(66px + env(safe-area-inset-bottom, 0px));
+    right: 14px;
+    z-index: 120;
+    pointer-events: auto;
+  }
+
+  .hire-me-btn {
+    padding: 7px 12px;
+    border-radius: 20px;
+    box-shadow: 0 4px 0 #872e0d, 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 122, 24, 0.4);
+  }
+
+  .hire-btn-subtitle {
+    display: none; /* Shrink secondary line on mobile for clean space */
+  }
+
+  .hire-btn-title {
+    font-size: 8px;
+  }
+
+  /* Popover opens upward above floating button */
+  .hire-popover {
+    top: auto;
+    bottom: calc(100% + 10px);
+    right: 0;
+    width: 240px;
+    animation: popoverFadeUp 0.15s ease-out;
+  }
+
+  @keyframes popoverFadeUp {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
 
@@ -1004,6 +1678,12 @@ html, body {
   .battle-cards-grid {
     grid-template-columns: 1fr;
   }
+
+  .services-cta-btn {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 10px;
+  }
 }
 
 /* Extra Small Phones (< 380px) */
@@ -1018,5 +1698,28 @@ html, body {
 
   .compass-text {
     font-size: 6.5px;
+  }
+
+  .service-meta-row {
+    flex-direction: column;
+    gap: 3px;
+  }
+}
+
+/* Accessibility: Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .service-offer-card,
+  .opensource-org-card {
+    transition: none !important;
+  }
+  .service-offer-card:hover,
+  .opensource-org-card:hover {
+    transform: none !important;
+  }
+  .hire-pulse-dot {
+    animation: none !important;
+  }
+  .hire-popover {
+    animation: none !important;
   }
 }

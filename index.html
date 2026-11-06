@@ -67,6 +67,9 @@
 
     <!-- Right Controls -->
     <div class="hud-actions">
+      <!-- Persistent Prominent Hire Me Button Mount -->
+      <div id="hire-button-mount"></div>
+
       <!-- Permanent Glowing Resume Button (Always Visible On-Screen) -->
       <a href="https://drive.google.com/file/d/1cT9AdrHuSwM93CPUsjus9PfUzDXhagcT/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="hud-resume-btn" title="View / Download Padmasri's Resume">
         <span>📄</span>
@@ -78,12 +81,6 @@
         <span>📜</span>
         <span>HERO CARD</span>
       </button>
-
-      <!-- Hidden Coins Counter -->
-      <div class="coin-counter-badge" title="Hidden Coins Found in Field">
-        <span>🪙</span>
-        <span id="coin-counter-val">0/5</span>
-      </div>
 
       <!-- Audio Mute / Unmute Button -->
       <button id="btn-sound-toggle" class="hud-btn" title="Toggle 8-bit Audio">
@@ -317,43 +314,73 @@
         <div class="milestone-card-overlay" id="card-skills" data-station="2" style="left: 12%; top: 59%;">
           <span class="card-step-badge">02 • ARSENAL</span>
           <div class="card-title">TECH SKILLS</div>
-          <div class="card-subtitle">React 18, Node.js, C++, Gemini AI, MongoDB</div>
-          <div class="card-action-hint"><span>Inspect Spellbook</span><span>▶</span></div>
+          <div class="card-subtitle">Full-Stack MERN, C++, TypeScript, Socket.IO, Gemini AI</div>
+          <div class="card-action-hint"><span>Inspect Skills</span><span>▶</span></div>
         </div>
 
-        <!-- Milestone 3 (Upper Center): Featured Projects -->
-        <div class="milestone-pin-container" data-station="3" style="left: 56%; top: 40%;">
+        <!-- Milestone 3 (Center Left Curve): Open Source Contributions -->
+        <div class="milestone-pin-container" data-station="3" style="left: 31%; top: 49.5%;">
           <svg class="milestone-pin-svg" viewBox="0 0 32 42">
             <path d="M 16 0 C 7.2 0, 0 7.2, 0 16 C 0 28, 16 42, 16 42 C 16 42, 32 28, 32 16 C 32 7.2, 24.8 0, 16 0 Z" fill="#e74c3c" stroke="#922b21" stroke-width="2"/>
             <circle cx="16" cy="15" r="7" fill="#ffffff" />
             <circle cx="16" cy="15" r="4" fill="#c0392b" />
           </svg>
         </div>
-        <div class="milestone-card-overlay" id="card-projects" data-station="3" style="left: 36%; top: 42%;">
-          <span class="card-step-badge">03 • QUESTS</span>
+        <div class="milestone-card-overlay" id="card-opensource" data-station="3" style="left: 42%; top: 50%;">
+          <span class="card-step-badge">03 • OPEN SOURCE</span>
+          <div class="card-title">OPEN SOURCE PROFILE</div>
+          <div class="card-subtitle">Jaeger & OpenTelemetry (CNCF) • 14 merged PRs</div>
+          <div class="card-action-hint"><span>Inspect Contributions</span><span>▶</span></div>
+        </div>
+
+        <!-- Milestone 4 (Upper Center): Featured Projects -->
+        <div class="milestone-pin-container" data-station="4" style="left: 52%; top: 40.5%;">
+          <svg class="milestone-pin-svg" viewBox="0 0 32 42">
+            <path d="M 16 0 C 7.2 0, 0 7.2, 0 16 C 0 28, 16 42, 16 42 C 16 42, 32 28, 32 16 C 32 7.2, 24.8 0, 16 0 Z" fill="#e74c3c" stroke="#922b21" stroke-width="2"/>
+            <circle cx="16" cy="15" r="7" fill="#ffffff" />
+            <circle cx="16" cy="15" r="4" fill="#c0392b" />
+          </svg>
+        </div>
+        <div class="milestone-card-overlay" id="card-projects" data-station="4" style="left: 28%; top: 41%;">
+          <span class="card-step-badge">04 • QUESTS</span>
           <div class="card-title">FEATURED PROJECTS</div>
           <div class="card-subtitle">ShopBazar, MovieAdda (AI), CampusFind, Matiks</div>
           <div class="card-action-hint"><span>Browse 5 Quests</span><span>▶</span></div>
         </div>
 
-        <!-- Milestone 4 (Mid Right): Battle Arena & Achievements -->
-        <div class="milestone-pin-container" data-station="4" style="left: 70%; top: 28%;">
+        <!-- Milestone 5 (Mid Right Curve): Workshop / Services -->
+        <div class="milestone-pin-container" data-station="5" style="left: 66%; top: 32.5%;">
           <svg class="milestone-pin-svg" viewBox="0 0 32 42">
             <path d="M 16 0 C 7.2 0, 0 7.2, 0 16 C 0 28, 16 42, 16 42 C 16 42, 32 28, 32 16 C 32 7.2, 24.8 0, 16 0 Z" fill="#e74c3c" stroke="#922b21" stroke-width="2"/>
             <circle cx="16" cy="15" r="7" fill="#ffffff" />
             <circle cx="16" cy="15" r="4" fill="#c0392b" />
           </svg>
         </div>
-        <div class="milestone-card-overlay" id="card-achievements" data-station="4" style="left: 64%; top: 30%;">
-          <span class="card-step-badge">04 • BOSS LOGS</span>
+        <div class="milestone-card-overlay" id="card-services" data-station="5" style="left: 70%; top: 33.5%;">
+          <span class="card-step-badge">05 • SERVICES</span>
+          <div class="card-title">WHAT I CAN BUILD</div>
+          <div class="card-subtitle">Full-Stack Apps, AI Features & Real-Time</div>
+          <div class="card-action-hint"><span>Explore Services</span><span>▶</span></div>
+        </div>
+
+        <!-- Milestone 6 (Mid Right): Battle Arena & Achievements -->
+        <div class="milestone-pin-container" data-station="6" style="left: 74%; top: 20.5%;">
+          <svg class="milestone-pin-svg" viewBox="0 0 32 42">
+            <path d="M 16 0 C 7.2 0, 0 7.2, 0 16 C 0 28, 16 42, 16 42 C 16 42, 32 28, 32 16 C 32 7.2, 24.8 0, 16 0 Z" fill="#e74c3c" stroke="#922b21" stroke-width="2"/>
+            <circle cx="16" cy="15" r="7" fill="#ffffff" />
+            <circle cx="16" cy="15" r="4" fill="#c0392b" />
+          </svg>
+        </div>
+        <div class="milestone-card-overlay" id="card-achievements" data-station="6" style="left: 50%; top: 22%;">
+          <span class="card-step-badge">06 • BOSS LOGS</span>
           <div class="card-title">ACHIEVEMENTS</div>
-          <div class="card-subtitle">250+ LeetCode, Codeforces 777, 10 CNCF PRs</div>
+          <div class="card-subtitle">250+ LeetCode, Codeforces 777, 14 CNCF PRs</div>
           <div class="card-action-hint"><span>View Trophy Case</span><span>▶</span></div>
         </div>
 
-        <!-- Milestone 5 (Top Right): Summit & Contact -->
-        <div class="milestone-card-overlay" id="card-contact" data-station="5" style="left: 62%; top: 11%;">
-          <span class="card-step-badge">05 • SUMMIT</span>
+        <!-- Milestone 7 (Top Right): Summit & Contact -->
+        <div class="milestone-card-overlay" id="card-contact" data-station="7" style="left: 62%; top: 11%;">
+          <span class="card-step-badge">07 • SUMMIT</span>
           <div class="card-title">HIRE & CONTACT</div>
           <div class="card-subtitle">Direct Transmission, Resume & Socials</div>
           <div class="card-action-hint"><span>Reach Summit</span><span>▶</span></div>
@@ -469,7 +496,7 @@
       <span>RESUME ↗</span>
     </a>
 
-    <span class="control-hint">Scroll down / up to travel • Press [P] for Hero Card</span>
+    <span class="control-hint">Scroll down / up to travel</span>
   </footer>
 
   <!-- ==========================================================================
