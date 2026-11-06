@@ -52,11 +52,12 @@ export class RoadmapGame {
     this.modalTag = document.getElementById('modal-station-tag');
     this.modalBody = document.getElementById('modal-body-content');
 
-    // Milestones definitions (mapped along path 0.0 to 1.0)
+    // Milestones definitions (mapped along path 0.0 to 1.0 at equal distances: i / 7)
+    const TOTAL_INTERVALS = 7;
     this.milestones = [
       {
         id: 0,
-        progress: 0.0,
+        progress: 0 / TOTAL_INTERVALS,
         name: "ORIGIN & START",
         title: "START: Padmasri's Origin",
         tag: "STATION 0",
@@ -65,7 +66,7 @@ export class RoadmapGame {
       },
       {
         id: 1,
-        progress: 0.18,
+        progress: 1 / TOTAL_INTERVALS,
         name: "01 • ACADEMY",
         title: "Knowledge Glade: Mirai School of Tech",
         tag: "STATION 1",
@@ -74,7 +75,7 @@ export class RoadmapGame {
       },
       {
         id: 2,
-        progress: 0.35,
+        progress: 2 / TOTAL_INTERVALS,
         name: "02 • TECH ARSENAL",
         title: "The Arsenal: Full-Stack & AI Stack",
         tag: "STATION 2",
@@ -83,7 +84,7 @@ export class RoadmapGame {
       },
       {
         id: 3,
-        progress: 0.50,
+        progress: 3 / TOTAL_INTERVALS,
         name: "03 • OPEN SOURCE",
         title: "OPEN SOURCE PROFILE",
         tag: "STATION 3",
@@ -92,7 +93,7 @@ export class RoadmapGame {
       },
       {
         id: 4,
-        progress: 0.64,
+        progress: 4 / TOTAL_INTERVALS,
         name: "04 • QUEST VALLEY",
         title: "Quest Valley: 5 Featured Projects",
         tag: "STATION 4",
@@ -101,7 +102,7 @@ export class RoadmapGame {
       },
       {
         id: 5,
-        progress: 0.77,
+        progress: 5 / TOTAL_INTERVALS,
         name: "05 • SERVICES",
         title: "Workshop: What I Can Build For You",
         tag: "STATION 5",
@@ -110,7 +111,7 @@ export class RoadmapGame {
       },
       {
         id: 6,
-        progress: 0.89,
+        progress: 6 / TOTAL_INTERVALS,
         name: "06 • BOSS LOGS",
         title: "Battle Arena: 250+ LeetCode & Achievements",
         tag: "STATION 6",
@@ -138,6 +139,7 @@ export class RoadmapGame {
     }
 
     this.pathLength = this.pathEl.getTotalLength();
+    this.positionPinsAlongPath();
 
     // Bind scroll-driven movement
     window.addEventListener('scroll', () => this.handleScroll(), { passive: true });
@@ -435,6 +437,23 @@ export class RoadmapGame {
         ? '<span>🔇</span><span>MUTED</span>' 
         : '<span>🔊</span><span>SOUND ON</span>';
     }
+  }
+
+  // Position milestone pins precisely at each stop along the SVG road path
+  positionPinsAlongPath() {
+    if (!this.pathEl) return;
+    this.milestones.forEach((m, idx) => {
+      if (idx === 0 || idx === 7) return; // Origin monument and summit trophy are positioned specifically
+      const point = this.pathEl.getPointAtLength(m.progress * this.pathLength);
+      const leftPercent = (point.x / 1000) * 100;
+      const topPercent = (point.y / 2000) * 100;
+
+      const pin = document.querySelector(`.milestone-pin-container[data-station="${idx}"]`);
+      if (pin) {
+        pin.style.left = `${leftPercent.toFixed(1)}%`;
+        pin.style.top = `${topPercent.toFixed(1)}%`;
+      }
+    });
   }
 
   bindPinsAndCards() {
