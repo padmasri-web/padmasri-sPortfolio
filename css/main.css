@@ -33,8 +33,6 @@ html, body {
   font-family: 'Pixelify Sans', 'Fira Code', monospace;
   overflow-x: hidden;
   -webkit-font-smoothing: none;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: none;
 }
 
 /* CRT Scanline Filter Overlay (Subtle) */

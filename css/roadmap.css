@@ -10,7 +10,6 @@
   min-height: 100vh;
   background-color: #5ea332;
   overflow-x: hidden;
-  touch-action: pan-y;
 }
 
 /* Scroll Track that drives window scrolling */
@@ -35,25 +34,22 @@
     radial-gradient(#5ea332 15%, transparent 16%);
   background-size: 28px 28px;
   background-position: 0 0, 14px 14px;
-  pointer-events: none; /* Allows touch swipes on the background to scroll the window */
-  touch-action: pan-y;
-  contain: strict;
+  pointer-events: none;
 }
 
 /* The world map container that smoothly pans in 2D to follow the player */
 .roadmap-world {
   position: absolute;
   top: 0;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   width: clamp(650px, 95vw, 1000px);
   aspect-ratio: 1000 / 2000;
   height: auto;
-  transform-origin: top left;
+  transform-origin: top center;
   user-select: none;
   pointer-events: none;
   will-change: transform;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
 /* SVG Map Overlay */

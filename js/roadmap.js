@@ -40,6 +40,7 @@ export class RoadmapGame {
     this.windowH = typeof window !== 'undefined' ? window.innerHeight : 800;
     this.maxScroll = 1;
     this.lastActiveStation = -1;
+    this.isProgrammaticScroll = false;
     this.pinElements = [];
     this.cardElements = [];
 
@@ -158,8 +159,72 @@ export class RoadmapGame {
     // Cache dimensions to eliminate layout thrashing during scroll
     this.updateDimensions();
 
-    // High-performance scroll tracking via requestAnimationFrame
-    window.addEventListener('scroll', () => this.handleScroll(), { passive: true });
+    // 1. Native Window Scroll
+    window.addEventListener('scroll', () => {
+      if (this.isProgrammaticScroll) return;
+      const scrollY = window.scrollY;
+      const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      this.targetProgress = Math.max(0, Math.min(1, scrollY / max));
+    }, { passive: true });
+
+    // 2. Desktop Wheel & Trackpad
+    window.addEventListener('wheel', (e) => {
+      if (this.modalBackdrop && this.modalBackdrop.classList.contains('open')) return;
+      const hirePopover = document.getElementById('hire-me-popover');
+      if (hirePopover && hirePopover.classList.contains('open')) return;
+
+      const delta = Math.sign(e.deltaY) * Math.min(0.04, Math.abs(e.deltaY) * 0.00035);
+      this.targetProgress = Math.max(0, Math.min(1, this.targetProgress + delta));
+      this.syncScrollPosition();
+    }, { passive: true });
+
+    // 3. Mobile Touch Gestures with natural momentum flick
+    let touchLastY = 0;
+    let touchVelocity = 0;
+    let lastTouchTime = 0;
+    let isTouching = false;
+
+    window.addEventListener('touchstart', (e) => {
+      sound.init();
+      if (e.touches.length === 1) {
+        touchLastY = e.touches[0].clientY;
+        lastTouchTime = performance.now();
+        touchVelocity = 0;
+        isTouching = true;
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!isTouching || e.touches.length !== 1) return;
+      if (this.modalBackdrop && this.modalBackdrop.classList.contains('open')) return;
+      const hirePopover = document.getElementById('hire-me-popover');
+      if (hirePopover && hirePopover.classList.contains('open')) return;
+
+      const currentY = e.touches[0].clientY;
+      const deltaY = touchLastY - currentY; // positive = swipe up = move forward down the road
+      const now = performance.now();
+      const dt = Math.max(1, now - lastTouchTime);
+
+      touchVelocity = deltaY / dt;
+      touchLastY = currentY;
+      lastTouchTime = now;
+
+      // Responsive touch step sensitivity
+      const sensitivity = 1 / (window.innerHeight * 2.5);
+      this.targetProgress = Math.max(0, Math.min(1, this.targetProgress + deltaY * sensitivity));
+      this.syncScrollPosition();
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      if (!isTouching) return;
+      isTouching = false;
+      // Add natural momentum flick
+      if (Math.abs(touchVelocity) > 0.35) {
+        const momentum = Math.max(-0.15, Math.min(0.15, touchVelocity * 0.08));
+        this.targetProgress = Math.max(0, Math.min(1, this.targetProgress + momentum));
+        this.syncScrollPosition();
+      }
+    }, { passive: true });
 
     // Handle resize & orientation with debounce
     let resizeTimer = null;
@@ -178,12 +243,11 @@ export class RoadmapGame {
       }, 150);
     }, { passive: true });
 
-    // Unlock Web Audio on initial user gesture (non-blocking)
-    window.addEventListener('touchstart', () => sound.init(), { passive: true, once: true });
-    window.addEventListener('pointerdown', () => sound.init(), { passive: true, once: true });
-
     // Initial position at Start (Progress 0)
     this.updateView(0);
+
+    // Start continuous physics lerp loop
+    requestAnimationFrame(() => this.tick());
 
     // Bind controls, pins, and collectibles
     this.bindControls();
@@ -194,6 +258,13 @@ export class RoadmapGame {
     this.updateAudioIcon();
   }
 
+  syncScrollPosition() {
+    const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    this.isProgrammaticScroll = true;
+    window.scrollTo(0, this.targetProgress * max);
+    this.isProgrammaticScroll = false;
+  }
+
   updateDimensions() {
     this.windowW = window.innerWidth;
     this.windowH = window.innerHeight;
@@ -201,51 +272,43 @@ export class RoadmapGame {
       this.worldW = this.worldEl.offsetWidth || 1000;
       this.worldH = this.worldEl.offsetHeight || 2000;
     }
-    this.maxScroll = Math.max(1, document.documentElement.scrollHeight - this.windowH);
   }
 
-  // Handle continuous scroll-driven character movement via vsync rAF
-  handleScroll() {
-    if (!this.ticking) {
-      requestAnimationFrame(() => {
-        this.renderFrame();
-        this.ticking = false;
-      });
-      this.ticking = true;
-    }
-  }
+  // Continuous physics lerp animation loop (guarantees silky-smooth gliding)
+  tick() {
+    const diff = this.targetProgress - this.currentProgress;
 
-  renderFrame() {
-    const scrollY = window.scrollY;
-    if (this.maxScroll <= 0) {
-      this.maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-    }
-    const progress = Math.max(0, Math.min(1, scrollY / this.maxScroll));
+    if (Math.abs(diff) > 0.0001) {
+      // Smooth exponential easing (0.12 provides responsive, fluid glide)
+      this.currentProgress += diff * 0.12;
 
-    const isMovingForward = scrollY >= this.lastScrollY;
-    this.lastScrollY = scrollY;
+      const isMovingForward = diff > 0;
 
-    // Footsteps sound while scrolling (only if audio unmuted)
-    if (!sound.isMuted()) {
+      // Play footsteps sound while moving (only if audio unmuted)
       const now = performance.now();
-      if (now - this.lastStepTime > 200) {
+      if (!sound.isMuted() && now - this.lastStepTime > 180 && Math.abs(diff) > 0.001) {
         sound.playStep();
         this.lastStepTime = now;
       }
-    }
 
-    // Walking animation state toggle
-    if (!this.isWalking) {
-      this.characterEl.classList.add('is-walking');
-      this.isWalking = true;
-    }
-    clearTimeout(this.scrollTimeout);
-    this.scrollTimeout = setTimeout(() => {
+      // Walking animation state toggle
+      if (!this.isWalking) {
+        this.characterEl.classList.add('is-walking');
+        this.isWalking = true;
+      }
+      clearTimeout(this.scrollTimeout);
+      this.scrollTimeout = setTimeout(() => {
+        this.characterEl.classList.remove('is-walking');
+        this.isWalking = false;
+      }, 100);
+
+      this.updateView(this.currentProgress, isMovingForward);
+    } else if (this.isWalking) {
       this.characterEl.classList.remove('is-walking');
       this.isWalking = false;
-    }, 120);
+    }
 
-    this.updateView(progress, isMovingForward);
+    requestAnimationFrame(() => this.tick());
   }
 
   updateView(progress, isMovingForward = true) {
@@ -272,25 +335,30 @@ export class RoadmapGame {
 
     // Responsive 2D Camera Tracking: Zero layout thrashing using cached dimensions
     if (this.worldEl) {
-      const charPixelX = (point.x / 1000) * this.worldW;
-      const charPixelY = (point.y / 2000) * this.worldH;
+      const worldW = this.worldW || 1000;
+      const worldH = this.worldH || 2000;
+      const winW = this.windowW || window.innerWidth;
+      const winH = this.windowH || window.innerHeight;
 
-      // Vertical tracking
-      const minCamY = Math.min(0, this.windowH - this.worldH);
-      const targetCamY = (this.windowH * 0.52) - charPixelY;
+      const charPixelX = (point.x / 1000) * worldW;
+      const charPixelY = (point.y / 2000) * worldH;
+
+      // Vertical tracking: centers character at ~52% of screen height
+      const minCamY = Math.min(0, winH - worldH);
+      const targetCamY = (winH * 0.52) - charPixelY;
       const camY = Math.max(minCamY, Math.min(0, targetCamY));
 
-      // Horizontal tracking
-      let camX;
-      if (this.windowW < this.worldW) {
-        const targetCamX = (this.windowW / 2) - charPixelX;
-        const minCamX = this.windowW - this.worldW;
-        camX = Math.max(minCamX, Math.min(0, targetCamX));
+      // Horizontal tracking: centers on desktop, smoothly pans on mobile
+      if (winW < worldW) {
+        const targetCamX = (winW / 2) - charPixelX;
+        const minCamX = winW - worldW;
+        const camX = Math.max(minCamX, Math.min(0, targetCamX));
+        this.worldEl.style.left = '0';
+        this.worldEl.style.transform = `translate3d(${camX.toFixed(1)}px, ${camY.toFixed(1)}px, 0)`;
       } else {
-        camX = (this.windowW - this.worldW) / 2;
+        this.worldEl.style.left = '50%';
+        this.worldEl.style.transform = `translate3d(-50%, ${camY.toFixed(1)}px, 0)`;
       }
-
-      this.worldEl.style.transform = `translate3d(${camX.toFixed(1)}px, ${camY.toFixed(1)}px, 0)`;
     }
 
     // Real-Time "Next Stop" calculation
@@ -377,15 +445,21 @@ export class RoadmapGame {
   scrollToMilestone(index, openModalAfter = false) {
     if (index < 0 || index >= this.milestones.length) return;
     const milestone = this.milestones[index];
-    const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-    const targetScrollY = milestone.progress * maxScroll;
+    this.targetProgress = milestone.progress;
 
     sound.playClick();
 
+    const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    const targetScrollY = milestone.progress * maxScroll;
+
+    this.isProgrammaticScroll = true;
     window.scrollTo({
       top: targetScrollY,
       behavior: 'smooth'
     });
+    setTimeout(() => {
+      this.isProgrammaticScroll = false;
+    }, 600);
 
     if (openModalAfter) {
       setTimeout(() => {
