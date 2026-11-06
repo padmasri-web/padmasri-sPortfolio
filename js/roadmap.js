@@ -32,6 +32,16 @@ export class RoadmapGame {
     this.scrollTimeout = null;
     this.lastStepTime = 0;
     this.lastX = 330;
+    this.ticking = false;
+    this.isWalking = false;
+    this.worldW = 1000;
+    this.worldH = 2000;
+    this.windowW = typeof window !== 'undefined' ? window.innerWidth : 1000;
+    this.windowH = typeof window !== 'undefined' ? window.innerHeight : 800;
+    this.maxScroll = 1;
+    this.lastActiveStation = -1;
+    this.pinElements = [];
+    this.cardElements = [];
 
     // DOM Elements
     this.worldEl = document.getElementById('roadmap-world');
@@ -141,30 +151,36 @@ export class RoadmapGame {
     this.pathLength = this.pathEl.getTotalLength();
     this.positionPinsAlongPath();
 
-    // Bind scroll-driven movement
+    // Cache interactive DOM nodes
+    this.pinElements = Array.from(document.querySelectorAll('.milestone-pin-container'));
+    this.cardElements = Array.from(document.querySelectorAll('.milestone-card-overlay'));
+
+    // Cache dimensions to eliminate layout thrashing during scroll
+    this.updateDimensions();
+
+    // High-performance scroll tracking via requestAnimationFrame
     window.addEventListener('scroll', () => this.handleScroll(), { passive: true });
-    window.addEventListener('resize', () => this.updateView(this.currentProgress));
+
+    // Handle resize & orientation with debounce
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        this.updateDimensions();
+        this.updateView(this.currentProgress);
+      }, 50);
+    }, { passive: true });
+
     window.addEventListener('orientationchange', () => {
-      setTimeout(() => this.updateView(this.currentProgress), 150);
-    });
-
-    // Mobile touch swipe support
-    let touchStartY = 0;
-    window.addEventListener('touchstart', (e) => {
-      sound.init();
-      if (e.touches.length === 1) {
-        touchStartY = e.touches[0].clientY;
-      }
+      setTimeout(() => {
+        this.updateDimensions();
+        this.updateView(this.currentProgress);
+      }, 150);
     }, { passive: true });
 
-    window.addEventListener('touchmove', (e) => {
-      if (e.touches.length === 1 && !this.modalBackdrop.classList.contains('open')) {
-        const currentY = e.touches[0].clientY;
-        const deltaY = (touchStartY - currentY) * 1.4;
-        touchStartY = currentY;
-        window.scrollBy({ top: deltaY, behavior: 'auto' });
-      }
-    }, { passive: true });
+    // Unlock Web Audio on initial user gesture (non-blocking)
+    window.addEventListener('touchstart', () => sound.init(), { passive: true, once: true });
+    window.addEventListener('pointerdown', () => sound.init(), { passive: true, once: true });
 
     // Initial position at Start (Progress 0)
     this.updateView(0);
@@ -178,30 +194,56 @@ export class RoadmapGame {
     this.updateAudioIcon();
   }
 
-  // Handle continuous scroll-driven character movement
-  handleScroll() {
-    const scrollY = window.scrollY;
-    const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-    const progress = Math.max(0, Math.min(1, scrollY / maxScroll));
+  updateDimensions() {
+    this.windowW = window.innerWidth;
+    this.windowH = window.innerHeight;
+    if (this.worldEl) {
+      this.worldW = this.worldEl.offsetWidth || 1000;
+      this.worldH = this.worldEl.offsetHeight || 2000;
+    }
+    this.maxScroll = Math.max(1, document.documentElement.scrollHeight - this.windowH);
+  }
 
-    sound.init();
+  // Handle continuous scroll-driven character movement via vsync rAF
+  handleScroll() {
+    if (!this.ticking) {
+      requestAnimationFrame(() => {
+        this.renderFrame();
+        this.ticking = false;
+      });
+      this.ticking = true;
+    }
+  }
+
+  renderFrame() {
+    const scrollY = window.scrollY;
+    if (this.maxScroll <= 0) {
+      this.maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    }
+    const progress = Math.max(0, Math.min(1, scrollY / this.maxScroll));
 
     const isMovingForward = scrollY >= this.lastScrollY;
     this.lastScrollY = scrollY;
 
-    // Footsteps sound while scrolling
-    const now = performance.now();
-    if (now - this.lastStepTime > 180) {
-      sound.playStep();
-      this.lastStepTime = now;
+    // Footsteps sound while scrolling (only if audio unmuted)
+    if (!sound.isMuted()) {
+      const now = performance.now();
+      if (now - this.lastStepTime > 200) {
+        sound.playStep();
+        this.lastStepTime = now;
+      }
     }
 
-    // Update character state
-    this.characterEl.classList.add('is-walking');
+    // Walking animation state toggle
+    if (!this.isWalking) {
+      this.characterEl.classList.add('is-walking');
+      this.isWalking = true;
+    }
     clearTimeout(this.scrollTimeout);
     this.scrollTimeout = setTimeout(() => {
       this.characterEl.classList.remove('is-walking');
-    }, 150);
+      this.isWalking = false;
+    }, 120);
 
     this.updateView(progress, isMovingForward);
   }
@@ -217,8 +259,8 @@ export class RoadmapGame {
     const leftPercent = (point.x / 1000) * 100;
     const topPercent = (point.y / 2000) * 100;
 
-    this.characterEl.style.left = `${leftPercent}%`;
-    this.characterEl.style.top = `${topPercent}%`;
+    this.characterEl.style.left = `${leftPercent.toFixed(2)}%`;
+    this.characterEl.style.top = `${topPercent.toFixed(2)}%`;
 
     // Direction flip
     if (point.x < this.lastX - 0.5) {
@@ -228,30 +270,27 @@ export class RoadmapGame {
     }
     this.lastX = point.x;
 
-    // Responsive 2D Camera Tracking: Smoothly pans to follow the player on all screen sizes
+    // Responsive 2D Camera Tracking: Zero layout thrashing using cached dimensions
     if (this.worldEl) {
-      const worldW = this.worldEl.offsetWidth;
-      const worldH = this.worldEl.offsetHeight;
-
-      const charPixelX = (point.x / 1000) * worldW;
-      const charPixelY = (point.y / 2000) * worldH;
+      const charPixelX = (point.x / 1000) * this.worldW;
+      const charPixelY = (point.y / 2000) * this.worldH;
 
       // Vertical tracking
-      const minCamY = Math.min(0, window.innerHeight - worldH);
-      const targetCamY = (window.innerHeight * 0.52) - charPixelY;
+      const minCamY = Math.min(0, this.windowH - this.worldH);
+      const targetCamY = (this.windowH * 0.52) - charPixelY;
       const camY = Math.max(minCamY, Math.min(0, targetCamY));
 
-      // Horizontal tracking when screen is narrower than the world (mobile/tablets)
-      if (window.innerWidth < worldW) {
-        const targetCamX = (window.innerWidth / 2) - charPixelX;
-        const minCamX = window.innerWidth - worldW;
-        const camX = Math.max(minCamX, Math.min(0, targetCamX));
-        this.worldEl.style.left = '0';
-        this.worldEl.style.transform = `translate3d(${camX}px, ${camY}px, 0)`;
+      // Horizontal tracking
+      let camX;
+      if (this.windowW < this.worldW) {
+        const targetCamX = (this.windowW / 2) - charPixelX;
+        const minCamX = this.windowW - this.worldW;
+        camX = Math.max(minCamX, Math.min(0, targetCamX));
       } else {
-        this.worldEl.style.left = '50%';
-        this.worldEl.style.transform = `translate3d(-50%, ${camY}px, 0)`;
+        camX = (this.windowW - this.worldW) / 2;
       }
+
+      this.worldEl.style.transform = `translate3d(${camX.toFixed(1)}px, ${camY.toFixed(1)}px, 0)`;
     }
 
     // Real-Time "Next Stop" calculation
@@ -259,7 +298,6 @@ export class RoadmapGame {
   }
 
   updateNextStop(progress) {
-    // Find next upcoming milestone
     let nextIdx = this.milestones.findIndex(m => m.progress > progress + 0.02);
     if (nextIdx === -1) nextIdx = this.milestones.length - 1;
 
@@ -275,45 +313,64 @@ export class RoadmapGame {
     const subProgress = Math.max(0, Math.min(1, (progress - currentM.progress) / range));
     const percentRemaining = Math.max(0, Math.round((1 - subProgress) * 100));
 
-    // Update HUD Banner
-    if (this.currentStopNameEl) {
+    // Update HUD Banner (prevent redundant DOM mutations)
+    if (this.currentStopNameEl && this.currentStopNameEl.textContent !== currentM.name) {
       this.currentStopNameEl.textContent = currentM.name;
     }
-    if (this.nextStopNameEl) {
-      this.nextStopNameEl.textContent = progress >= 0.98 ? "🏆 SUMMIT REACHED!" : nextM.name;
+    const nextText = progress >= 0.98 ? "🏆 SUMMIT REACHED!" : nextM.name;
+    if (this.nextStopNameEl && this.nextStopNameEl.textContent !== nextText) {
+      this.nextStopNameEl.textContent = nextText;
     }
     if (this.nextMeterFillEl) {
       this.nextMeterFillEl.style.width = `${Math.round(subProgress * 100)}%`;
     }
-    if (this.nextDistanceTextEl) {
-      this.nextDistanceTextEl.textContent = progress >= 0.98 ? "VICTORY" : `${percentRemaining}% to stop`;
+    const distText = progress >= 0.98 ? "VICTORY" : `${percentRemaining}% to stop`;
+    if (this.nextDistanceTextEl && this.nextDistanceTextEl.textContent !== distText) {
+      this.nextDistanceTextEl.textContent = distText;
     }
 
     // Update Floating Waypoint Compass at bottom
-    if (this.compassTextEl) {
-      this.compassTextEl.textContent = progress >= 0.98 ? "🏆 AT THE SUMMIT" : `NEXT STOP: ${nextM.name}`;
+    const compassText = progress >= 0.98 ? "🏆 AT THE SUMMIT" : `NEXT STOP: ${nextM.name}`;
+    if (this.compassTextEl && this.compassTextEl.textContent !== compassText) {
+      this.compassTextEl.textContent = compassText;
     }
 
     // Update Floating Speech Bubble over character
     if (this.speechBubbleEl) {
       const distToCurrent = Math.abs(progress - currentM.progress);
+      let bubbleHtml;
       if (distToCurrent < 0.03 && currentIdx > 0) {
-        this.speechBubbleEl.innerHTML = `<span>📍</span><span>At ${currentM.name}!</span>`;
+        bubbleHtml = `<span>📍</span><span>At ${currentM.name}!</span>`;
       } else if (progress >= 0.98) {
-        this.speechBubbleEl.innerHTML = `<span>🏆</span><span>Summit Victory!</span>`;
+        bubbleHtml = `<span>🏆</span><span>Summit Victory!</span>`;
       } else {
-        this.speechBubbleEl.innerHTML = `<span>🚀</span><span>Next: ${nextM.name} ➔</span>`;
+        bubbleHtml = `<span>🚀</span><span>Next: ${nextM.name} ➔</span>`;
+      }
+      if (this.speechBubbleEl.innerHTML !== bubbleHtml) {
+        this.speechBubbleEl.innerHTML = bubbleHtml;
       }
     }
 
-    // Highlight active pin & card
-    document.querySelectorAll('.milestone-pin-container').forEach(p => p.classList.remove('active-target'));
-    const activePin = document.querySelector(`.milestone-pin-container[data-station="${currentIdx}"]`);
-    if (activePin) activePin.classList.add('active-target');
+    // Highlight active pin & card ONLY when active station changes
+    if (this.lastActiveStation !== currentIdx) {
+      this.lastActiveStation = currentIdx;
 
-    document.querySelectorAll('.milestone-card-overlay').forEach(c => c.classList.remove('active'));
-    const activeCard = document.getElementById(currentM.cardId);
-    if (activeCard) activeCard.classList.add('active');
+      if (!this.pinElements || this.pinElements.length === 0) {
+        this.pinElements = Array.from(document.querySelectorAll('.milestone-pin-container'));
+      }
+      this.pinElements.forEach(p => {
+        const isTarget = parseInt(p.dataset.station, 10) === currentIdx;
+        p.classList.toggle('active-target', isTarget);
+      });
+
+      if (!this.cardElements || this.cardElements.length === 0) {
+        this.cardElements = Array.from(document.querySelectorAll('.milestone-card-overlay'));
+      }
+      this.cardElements.forEach(c => {
+        const isTarget = parseInt(c.dataset.station, 10) === currentIdx;
+        c.classList.toggle('active', isTarget);
+      });
+    }
   }
 
   // Smoothly scroll to a milestone
